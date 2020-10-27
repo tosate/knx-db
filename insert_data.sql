@@ -16,5 +16,5 @@ INSERT INTO room (name,label,floor, roomproject) VALUES ('Kitchen','Küche','GF'
 
 INSERT INTO device (label,devicetype,deviceroom) VALUES ('Wohnzimmer',2,1);
 
-INSERT INTO groupaddress (maingroup,middlegroup,subgroup,addressdevice) VALUES (1,1,99,1);
-INSERT INTO groupaddress (maingroup,middlegroup,subgroup,addressdevice) VALUES (4,1,99,1);
+INSERT INTO groupaddress (maingroup,middlegroup,subgroup,groupaddressdevice) VALUES (1,1,99,1);
+INSERT INTO groupaddress (maingroup,middlegroup,subgroup,groupaddressdevice) VALUES (4,1,99,1);

@@ -1,0 +1,19 @@
+package de.devtom.java.services;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import de.devtom.java.entities.GroupAddress;
+import de.devtom.java.repositories.GroupAddressRepository;
+
+@Service
+public class GroupAddressService {
+	@Autowired
+	private GroupAddressRepository groupAddressRepository;
+	
+	public List<GroupAddress> list() {
+		return groupAddressRepository.findAll();
+	}
+}

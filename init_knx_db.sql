@@ -40,6 +40,6 @@ CREATE TABLE IF NOT EXISTS groupaddress (
   subgroup INTEGER NOT NULL,
   datatype TEXT,
   function TEXT,
-  addressdevice INTEGER NOT NULL, -- foreign key
+  groupaddressdevice INTEGER NOT NULL, -- foreign key
   PRIMARY KEY (groupaddressid ASC)
 );
