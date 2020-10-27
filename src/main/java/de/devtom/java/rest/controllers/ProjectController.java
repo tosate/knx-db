@@ -50,21 +50,12 @@ public class ProjectController {
 	@GetMapping(value = "/project/{projectid}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Project> getProject(@PathVariable Long projectid) {
 		ResponseEntity<Project> response = null;
-		try {
-			if(StringUtils.isEmpty(projectid)) {
-				throw new IllegalArgumentException("Project ID is not valid");
-			}
-			
-			Optional<Project> project = projectService.findById(projectid);
-			if(project.isPresent()) {
-				response = new ResponseEntity<>(project.get(), HttpStatus.OK);
-			} else {
-				LOGGER.error("No project with ID [{}]", projectid);
-				response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
-			}
-		} catch (IllegalArgumentException e) {
-			LOGGER.error("Invalid input: " + e.getMessage());
-			response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		Optional<Project> project = projectService.findById(projectid);
+		if(project.isPresent()) {
+			response = new ResponseEntity<>(project.get(), HttpStatus.OK);
+		} else {
+			LOGGER.error("No project with ID [{}]", projectid);
+			response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 		
 		return response;

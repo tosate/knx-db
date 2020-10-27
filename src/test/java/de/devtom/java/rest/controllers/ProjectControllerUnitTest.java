@@ -1,7 +1,7 @@
 package de.devtom.java.rest.controllers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Optional;
 
@@ -84,6 +84,41 @@ public class ProjectControllerUnitTest extends AbstractControllerUnitTest {
 			validateHttpStatus(HttpStatus.BAD_REQUEST, mvcResult);
 		} catch (JsonProcessingException e) {
 			fail(e.getMessage());
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testGetProject() {
+		long projectid = 1l;
+		Project project = new Project("name");
+		project.setProjectid(projectid);
+		
+		try {
+			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(Optional.of(project));
+			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(URI + "/" + projectid)).andReturn();
+			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
+			
+			validateHttpStatus(HttpStatus.OK, mvcResult);
+			String content = mvcResult.getResponse().getContentAsString();
+			String outputJson = mapToJson(project);
+			assertEquals(outputJson, content);
+		} catch (JsonProcessingException e) {
+			fail(e.getMessage());
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testGetProjectNotExistent() {
+		try {
+			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(URI + "/" + 1l)).andReturn();
+			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
+			
+			validateHttpStatus(HttpStatus.NOT_FOUND, mvcResult);
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
