@@ -24,6 +24,10 @@ public class RoomService {
 		return roomRepository.save(room);
 	}
 	
+	public Room update(Room room) {
+		return roomRepository.save(room);
+	}
+	
 	public Optional<Room> findById(Long roomid) {
 		return roomRepository.findById(roomid);
 	}

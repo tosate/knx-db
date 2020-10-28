@@ -47,4 +47,7 @@ public class Project {
 	public void setProjectid(Long projectid) {
 		this.projectid = projectid;
 	}
+	public List<Room> getRooms() {
+		return rooms;
+	}
 }

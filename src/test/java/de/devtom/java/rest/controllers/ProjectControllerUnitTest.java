@@ -7,14 +7,10 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -23,13 +19,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import de.devtom.java.entities.Project;
 import de.devtom.java.services.ProjectService;
 
-@AutoConfigureMockMvc
 @ContextConfiguration(classes = {ProjectController.class})
-@WebMvcTest
 public class ProjectControllerUnitTest extends AbstractControllerUnitTest {
-	private static final String URI = "/spring-rest/project";
-	@Autowired
-	private MockMvc mockMvc;
+	private static final String URI = BASE_PATH + "/project";
 	@MockBean
 	private ProjectService projectService;
 	
@@ -139,6 +131,9 @@ public class ProjectControllerUnitTest extends AbstractControllerUnitTest {
 			Mockito.verify(projectService, Mockito.times(1)).save(Mockito.any(Project.class));
 			
 			validateHttpStatus(HttpStatus.OK, mvcResult);
+			String content = mvcResult.getResponse().getContentAsString();
+			String outputJson = mapToJson(project);
+			assertEquals(outputJson, content);
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
@@ -157,6 +152,9 @@ public class ProjectControllerUnitTest extends AbstractControllerUnitTest {
 			Mockito.verify(projectService, Mockito.times(1)).delete(Mockito.any(Project.class));
 			
 			validateHttpStatus(HttpStatus.OK, mvcResult);
+			String content = mvcResult.getResponse().getContentAsString();
+			String outputJson = mapToJson(project);
+			assertEquals(outputJson, content);
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}

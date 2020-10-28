@@ -75,4 +75,12 @@ public class Room {
 	public Project getProject() {
 		return project;
 	}
+
+	public Long getRoomid() {
+		return roomid;
+	}
+
+	public void setRoomid(Long roomid) {
+		this.roomid = roomid;
+	}
 }
