@@ -87,15 +87,15 @@ public class RoomController {
 	}
 
 	@PutMapping(value = "/project/{projectid}/room/{roomid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Room> updateRoom(@PathVariable Long projectid, @PathVariable Long roomid, @RequestBody Room updatedRoom) {
+	public ResponseEntity<Room> updateRoom(@PathVariable Long projectid, @PathVariable Long roomid, @RequestBody Room room) {
 		ResponseEntity<Room> response = null;
 		try {
-			validateRoomFields(updatedRoom);
+			validateRoomFields(room);
 			Project project = getProject(projectid);
 			Room existingRoom = retrieveExistingRoom(project, roomid);
-			updatedRoom.setRoomid(existingRoom.getRoomid());
-			updatedRoom.setProject(existingRoom.getProject());
-			response = new ResponseEntity<>(roomService.update(updatedRoom), HttpStatus.OK);
+			room.setRoomid(existingRoom.getRoomid());
+			room.setProject(existingRoom.getProject());
+			response = new ResponseEntity<>(roomService.update(room), HttpStatus.OK);
 		} catch (IllegalArgumentException e) {
 			LOGGER.error("Invalid input: {}", e.getMessage());
 			response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);

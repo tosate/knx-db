@@ -13,6 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.TableGenerator;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 public class Room {
 	@Id
@@ -26,6 +28,7 @@ public class Room {
 	private String floor;
 	@ManyToOne
 	@JoinColumn(name="roomproject")
+	@JsonIgnore
 	private Project project;
 	@OneToMany(fetch = FetchType.EAGER, mappedBy="room", cascade = CascadeType.ALL)
 	private List<Device> devices;
