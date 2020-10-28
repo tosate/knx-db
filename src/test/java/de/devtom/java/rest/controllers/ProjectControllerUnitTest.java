@@ -123,4 +123,42 @@ public class ProjectControllerUnitTest extends AbstractControllerUnitTest {
 			fail(e.getMessage());
 		}
 	}
+	
+	@Test
+	public void testUpdateProject() {
+		long projectid = 1l;
+		Project project = new Project("name");
+		project.setProjectid(projectid);
+		
+		try {
+			String inputJson = mapToJson(project);
+			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(Optional.of(project));
+			Mockito.when(projectService.save(Mockito.any(Project.class))).thenReturn(project);
+			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(URI + "/" + projectid).contentType(MediaType.APPLICATION_JSON_VALUE).content(inputJson)).andReturn();
+			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(projectService, Mockito.times(1)).save(Mockito.any(Project.class));
+			
+			validateHttpStatus(HttpStatus.OK, mvcResult);
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testDeleteProject() {
+		long projectid = 1l;
+		Project project = new Project("name");
+		project.setProjectid(projectid);
+		
+		try {
+			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(Optional.of(project));
+			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(URI + "/" + projectid)).andReturn();
+			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(projectService, Mockito.times(1)).delete(Mockito.any(Project.class));
+			
+			validateHttpStatus(HttpStatus.OK, mvcResult);
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+	}
 }

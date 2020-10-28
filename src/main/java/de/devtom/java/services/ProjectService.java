@@ -29,4 +29,8 @@ public class ProjectService {
 	public Optional<Project> findByName(String name) {
 		return projectRepository.findByName(name);
 	}
+	
+	public void delete(Project project) {
+		projectRepository.delete(project);
+	}
 }

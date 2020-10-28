@@ -5,41 +5,36 @@ DROP TABLE IF EXISTS room;
 DROP TABLE IF EXISTS project;
 
 CREATE TABLE IF NOT EXISTS project (
-  projectid INTEGER,
-  name TEXT NOT NULL,
-  PRIMARY KEY (projectid ASC)
+  projectid INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS room (
-  roomid INTEGER NOT NULL,
+  roomid INTEGER  PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
   label TEXT NOT NULL,
   floor TEXT,
-  roomproject INTEGER NOT NULL, -- foreign key
-  PRIMARY KEY (roomid ASC)
+  roomproject INTEGER NOT NULL -- foreign key
 );
 
 CREATE TABLE IF NOT EXISTS device (
-  deviceid INTEGER NOT NULL,
+  deviceid INTEGER  PRIMARY KEY AUTOINCREMENT,
   label TEXT NOT NULL,
   devicetype INTEGER NOT NULL, -- foreign key
-  deviceroom INTEGER,
-  PRIMARY KEY (deviceid ASC)
+  deviceroom INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS type (
-  typeid INTEGER NOT NULL,
-  label TEXT NOT NULL,
-  PRIMARY KEY (typeid ASC)
+  typeid INTEGER  PRIMARY KEY AUTOINCREMENT,
+  label TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS groupaddress (
-  groupaddressid INTEGER NOT NULL,
+  groupaddressid INTEGER  PRIMARY KEY AUTOINCREMENT,
   maingroup INTEGER NOT NULL,
   middlegroup INTEGER NOT NULL,
   subgroup INTEGER NOT NULL,
   datatype TEXT,
   function TEXT,
-  groupaddressdevice INTEGER NOT NULL, -- foreign key
-  PRIMARY KEY (groupaddressid ASC)
+  groupaddressdevice INTEGER NOT NULL -- foreign key
 );

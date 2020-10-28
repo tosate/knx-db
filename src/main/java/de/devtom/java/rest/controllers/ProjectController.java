@@ -9,9 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,7 +22,7 @@ import de.devtom.java.entities.Project;
 import de.devtom.java.services.ProjectService;
 
 @RestController
-@RequestMapping("/spring-rest")
+@RequestMapping("/knx-db")
 public class ProjectController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProjectController.class);
 	@Autowired
@@ -30,9 +32,7 @@ public class ProjectController {
 	public ResponseEntity<Project> createProject(@RequestBody Project project) {
 		ResponseEntity<Project> response = null;
 		try {
-			if(StringUtils.isEmpty(project.getName())) {
-				throw new IllegalArgumentException("Project name cannot be empty");
-			}
+			validateProjectName(project);
 			Optional<Project> existingProject = projectService.findByName(project.getName());
 			if(existingProject.isPresent()) {
 				throw new IllegalArgumentException(String.format("Project with name [%s] already exists!", project.getName()));
@@ -40,7 +40,7 @@ public class ProjectController {
 				response = new ResponseEntity<>(projectService.save(project), HttpStatus.CREATED);
 			}
 		} catch (IllegalArgumentException e) {
-			LOGGER.error("Invalid input: " + e.getMessage());
+			LOGGER.error("Invalid input: {}", e.getMessage());
 			response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
@@ -59,5 +59,45 @@ public class ProjectController {
 		}
 		
 		return response;
+	}
+	
+	@PutMapping(value = "/project/{projectid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Project> updateProject(@PathVariable Long projectid, @RequestBody Project project) {
+		ResponseEntity<Project> response = null;
+		try {
+			validateProjectName(project);
+			Optional<Project> existingProject = projectService.findById(projectid);
+			if(existingProject.isPresent()) {
+				existingProject.get().setName(project.getName());
+				response = new ResponseEntity<>(projectService.save(existingProject.get()), HttpStatus.OK);
+			} else {
+				response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		} catch (IllegalArgumentException e) {
+			LOGGER.error("Invalid input: " + e.getMessage());
+			response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		return response;
+	}
+	
+	@DeleteMapping(value = "/project/{projectid}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Project> deleteProject(@PathVariable Long projectid) {
+		ResponseEntity<Project> response = null;
+		Optional<Project> existingProject = projectService.findById(projectid);
+		if(existingProject.isPresent()) {
+			projectService.delete(existingProject.get());
+			response = new ResponseEntity<Project>(existingProject.get(), HttpStatus.OK);
+		} else {
+			response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		
+		return response;
+	}
+	
+	private void validateProjectName(Project project) {
+		if(StringUtils.isEmpty(project.getName())) {
+			throw new IllegalArgumentException("Project name cannot be empty");
+		}
 	}
 }
