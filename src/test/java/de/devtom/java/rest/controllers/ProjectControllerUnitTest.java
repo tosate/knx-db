@@ -18,6 +18,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import de.devtom.java.entities.Project;
 import de.devtom.java.services.ProjectService;
+import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
 
 @ContextConfiguration(classes = {ProjectController.class})
 public class ProjectControllerUnitTest extends AbstractControllerUnitTest {

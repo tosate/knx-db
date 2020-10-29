@@ -3,7 +3,6 @@ package de.devtom.java.entities;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -30,7 +29,7 @@ public class Room {
 	@JoinColumn(name="roomproject")
 	@JsonIgnore
 	private Project project;
-	@OneToMany(fetch = FetchType.EAGER, mappedBy="room", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.EAGER, mappedBy="room")
 	private List<Device> devices;
 	
 	public Room() {
@@ -68,6 +67,7 @@ public class Room {
 	}
 	
 	public void addDevice(Device device) {
+		device.setRoom(this);
 		this.devices.add(device);
 	}
 
@@ -85,5 +85,9 @@ public class Room {
 
 	public void setRoomid(Long roomid) {
 		this.roomid = roomid;
+	}
+
+	public void deleteDevice(Device device) {
+		this.devices.remove(device);
 	}
 }

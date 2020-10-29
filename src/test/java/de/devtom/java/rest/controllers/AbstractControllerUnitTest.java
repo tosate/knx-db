@@ -19,7 +19,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @WebMvcTest
 @AutoConfigureMockMvc
 public abstract class AbstractControllerUnitTest {
-	protected static final String BASE_PATH = "/knx-db";
 	@Autowired
 	protected MockMvc mockMvc;
 	

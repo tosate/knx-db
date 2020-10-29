@@ -24,8 +24,10 @@ import de.devtom.java.entities.Room;
 import de.devtom.java.services.ProjectService;
 import de.devtom.java.services.RoomService;
 
+import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
+
 @RestController
-@RequestMapping("/knx-db")
+@RequestMapping(BASE_PATH)
 public class RoomController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RoomController.class);
 	

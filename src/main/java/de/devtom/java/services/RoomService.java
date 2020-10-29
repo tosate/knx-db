@@ -36,6 +36,6 @@ public class RoomService {
 		// remove item from the collection maintained by its parent
 		room.getProject().deleteRoom(room);
 		// explicitly delete the record in the database
-		roomRepository.delete(room);
+		roomRepository.deleteById(room.getRoomid());
 	}
 }

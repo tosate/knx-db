@@ -20,9 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import de.devtom.java.entities.Project;
 import de.devtom.java.services.ProjectService;
+import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
 
 @RestController
-@RequestMapping("/knx-db")
+@RequestMapping(BASE_PATH)
 public class ProjectController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProjectController.class);
 	@Autowired

@@ -2,6 +2,7 @@ package de.devtom.java.rest.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
+import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
 
 import java.util.Optional;
 
