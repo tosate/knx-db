@@ -106,6 +106,7 @@ public class DeviceController {
 			Room room = getRoom(project, roomid);
 			Device existingDevice = retrieveExistingDevice(room, deviceid);
 			deviceService.delete(existingDevice);
+			response = new ResponseEntity<>(existingDevice, HttpStatus.OK);
 		} catch (IllegalArgumentException e) {
 			LOGGER.error("Invalid input: {}", e.getMessage());
 			response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
