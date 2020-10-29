@@ -32,7 +32,7 @@ public class DeviceControllerUnitTest extends AbstractControllerUnitTest {
 	private static final String ROOM_LABEL = "room-label";
 	private static final Long DEVICE_ID = 1l;
 	private static final String DEVICE_LABEL = "device-label";
-	private static final String DEVICE_TYPE = "Lightbuld";
+	private static final String DEVICE_TYPE = "Lightbulb";
 	private static final String URI = BASE_PATH + "/project/" + PROJECT_ID + "/room/" + ROOM_ID + "/device";
 	@MockBean
 	private ProjectService projectService;

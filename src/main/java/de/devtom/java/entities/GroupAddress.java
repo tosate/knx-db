@@ -11,6 +11,8 @@ import javax.persistence.TableGenerator;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import de.devtom.java.utils.ServiceUtils;
+
 @Entity
 @Table(name = "groupaddress")
 public class GroupAddress {
@@ -83,5 +85,44 @@ public class GroupAddress {
 
 	public void setFunction(String function) {
 		this.function = function;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		// If the object is compared with itself then return true   
+        if (obj == this) { 
+            return true; 
+        } 
+  
+        /* Check if o is an instance of Complex or not 
+          "null instanceof [type]" also returns false */
+        if (!(obj instanceof GroupAddress)) { 
+            return false; 
+        } 
+          
+        // typecast o to GroupAddress so that we can compare data members
+        GroupAddress c = (GroupAddress)obj;
+        
+        if(this.getMainGroup() != c.getMainGroup()) {
+        	return false;
+        }
+        if(this.getMiddleGroup() != c.getMiddleGroup()) {
+        	return false;
+        }
+        if(this.getSubGroup() != c.getSubGroup()) {
+        	return false;
+        }
+        if(!ServiceUtils.compare(this.getDataType(), c.getDataType())) {
+        	return false;
+        }
+        if(!ServiceUtils.compare(this.getFunction(), c.getFunction())) {
+        	return false;
+        }
+        
+        return true;
+	}
+
+	public void setGroupAddressId(Long groupAddressId) {
+		this.groupAddressId = groupAddressId;
 	}
 }
