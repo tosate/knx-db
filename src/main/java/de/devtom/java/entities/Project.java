@@ -21,7 +21,7 @@ public class Project {
 	private String name;
 	@OneToMany(fetch = FetchType.EAGER, mappedBy="project")
 	private List<Room> rooms;
-	public Project() {
+	protected Project() {
 		
 	}
 	public Project(String name) {

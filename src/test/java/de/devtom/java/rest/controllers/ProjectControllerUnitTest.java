@@ -54,7 +54,7 @@ public class ProjectControllerUnitTest extends AbstractControllerUnitTest {
 	@Test
 	public void testCreateProjectEmptyName() {
 		try {
-			String inputJson = mapToJson(new Project());
+			String inputJson = mapToJson(new Project(""));
 			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(URI).contentType(MediaType.APPLICATION_JSON_VALUE).content(inputJson)).andReturn();
 
 			validateHttpStatus(HttpStatus.BAD_REQUEST, mvcResult);

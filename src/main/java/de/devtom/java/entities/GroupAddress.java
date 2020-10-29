@@ -34,4 +34,54 @@ public class GroupAddress {
 	@JoinColumn(name="groupaddressdevice")
 	@JsonIgnore
 	private Device device;
+	
+	protected GroupAddress() {
+		
+	}
+	
+	public GroupAddress(int mainGroup, int middleGroup, int subGroup) {
+		this.mainGroup = mainGroup;
+		this.middleGroup = middleGroup;
+		this.subGroup = subGroup;
+	}
+
+	public void setDevice(Device device) {
+		this.device = device;
+	}
+
+	public Device getDevice() {
+		return device;
+	}
+
+	public Long getGroupAddressId() {
+		return groupAddressId;
+	}
+
+	public int getMainGroup() {
+		return mainGroup;
+	}
+
+	public int getMiddleGroup() {
+		return middleGroup;
+	}
+
+	public int getSubGroup() {
+		return subGroup;
+	}
+
+	public String getDataType() {
+		return dataType;
+	}
+
+	public void setDataType(String dataType) {
+		this.dataType = dataType;
+	}
+
+	public String getFunction() {
+		return function;
+	}
+
+	public void setFunction(String function) {
+		this.function = function;
+	}
 }
