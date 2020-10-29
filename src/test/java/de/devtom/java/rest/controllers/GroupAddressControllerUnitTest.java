@@ -76,4 +76,34 @@ public class GroupAddressControllerUnitTest extends AbstractControllerUnitTest {
 			fail(e.getMessage());
 		}
 	}
+	
+	@Test
+	public void testGetGroupAddress() {
+		Project project = new Project(PROJECT_NAME);
+		project.setProjectid(PROJECT_ID);
+		Room room = new Room(ROOM_NAME, ROOM_LABEL);
+		room.setRoomid(ROOM_ID);
+		project.addRoom(room);
+		Device device = new Device(DEVICE_LABEL, DEVICE_TYPE);
+		device.setDeviceid(DEVICE_ID);
+		room.addDevice(device);
+		GroupAddress address = new GroupAddress(ADDR_MAIN_GROUP, ADDR_MIDDLE_GROUP, ADDR_SUB_GROUP);
+		address.setGroupAddressId(GROUP_ADDRESS_ID);
+		device.addAddress(address);
+		
+		try {
+			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(Optional.of(project));
+			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(URI + "/" + GROUP_ADDRESS_ID)).andReturn();
+			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
+			
+			validateHttpStatus(HttpStatus.OK, mvcResult);
+			String content = mvcResult.getResponse().getContentAsString();
+			String outputJson = mapToJson(address);
+			assertEquals(outputJson, content);
+		} catch (JsonProcessingException e) {
+			fail(e.getMessage());
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+	}
 }

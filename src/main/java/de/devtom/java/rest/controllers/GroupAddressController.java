@@ -2,6 +2,7 @@ package de.devtom.java.rest.controllers;
 
 import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
 
+import java.rmi.activation.UnknownObjectException;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -54,6 +56,39 @@ public class GroupAddressController {
 		return response;
 	}
 	
+	@GetMapping(value = "/project/{projectid}/room/{roomid}/device/{deviceid}/group-address/{groupaddressid}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<GroupAddress> getGroupAddress(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid, @PathVariable Long groupaddressid) {
+		ResponseEntity<GroupAddress> response = null;
+		try {
+			Project project = getProject(projectid);
+			Room room = getRoom(project, roomid);
+			Device device = getDevice(room, deviceid);
+			response = new ResponseEntity<>(retieveExistingGroupAddress(device, groupaddressid), HttpStatus.OK);
+		} catch (IllegalArgumentException e) {
+			LOGGER.error("Invalid input: {}", e.getMessage());
+			response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		} catch (UnknownObjectException e) {
+			LOGGER.error(e.getMessage());
+			response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		
+		return response;
+	}
+	
+	private GroupAddress retieveExistingGroupAddress(Device device, Long groupaddressid) throws UnknownObjectException {
+		Optional<GroupAddress> result = Optional.empty();
+		for(GroupAddress address : device.getGroupAddresses()) {
+			if(address.getGroupAddressId().equals(groupaddressid)) {
+				result = Optional.of(address);
+			}
+		}
+		if(result.isPresent()) {
+			return result.get();
+		} else {
+			throw new UnknownObjectException(String.format("No group address with ID [%d]", groupaddressid));
+		}
+	}
+
 	private Project getProject(Long projectid) {
 		Optional<Project> project = projectService.findById(projectid);
 		if(project.isPresent()) {
