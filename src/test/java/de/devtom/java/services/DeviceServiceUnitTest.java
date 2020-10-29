@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import de.devtom.java.entities.Device;
 import de.devtom.java.entities.Project;
 import de.devtom.java.entities.Room;
-import de.devtom.java.entities.Type;
 
 @SpringBootTest
 public class DeviceServiceUnitTest {
@@ -23,8 +22,6 @@ public class DeviceServiceUnitTest {
 	private RoomService roomService;
 	@Autowired
 	private ProjectService projectService;
-	@Autowired
-	private TypeService typeService;
 	
 	@Test
 	public void testList() {
@@ -44,12 +41,7 @@ public class DeviceServiceUnitTest {
 			fail(String.format("Project [%s] has no room", project.get().getName()));
 		}
 		Room room = project.get().getRooms().get(0);
-		Optional<Type> deviceType = typeService.findById(1l);
-		if(!deviceType.isPresent()) {
-			fail(String.format("No DeviceType with ID [%d] found!", 1l));
-		}
-		Device device = new Device("device-label");
-		device.setDeviceType(deviceType.get());
+		Device device = new Device("device-label", "Lightbulb");
 		int count = deviceService.list().size();
 		Device savedDevice = deviceService.save(room, device);
 		roomService.save(project.get(), room);

@@ -90,4 +90,8 @@ public class Room {
 	public void deleteDevice(Device device) {
 		this.devices.remove(device);
 	}
+
+	public List<Device> getDevices() {
+		return devices;
+	}
 }

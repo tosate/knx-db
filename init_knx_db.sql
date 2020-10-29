@@ -1,6 +1,5 @@
 DROP TABLE IF EXISTS groupaddress;
 DROP TABLE IF EXISTS device;
-DROP TABLE IF EXISTS type;
 DROP TABLE IF EXISTS room;
 DROP TABLE IF EXISTS project;
 
@@ -20,13 +19,8 @@ CREATE TABLE IF NOT EXISTS room (
 CREATE TABLE IF NOT EXISTS device (
   deviceid INTEGER  PRIMARY KEY AUTOINCREMENT,
   label TEXT NOT NULL,
-  devicetype INTEGER NOT NULL, -- foreign key
+  devicetype Text NOT NULL,
   deviceroom INTEGER
-);
-
-CREATE TABLE IF NOT EXISTS type (
-  typeid INTEGER  PRIMARY KEY AUTOINCREMENT,
-  label TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS groupaddress (

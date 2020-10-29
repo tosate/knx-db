@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -24,9 +25,8 @@ public class Device {
 			pkColumnValue="device")
 	private Long deviceid;
 	private String label;
-	@ManyToOne
-	@JoinColumn(name="devicetype")
-	private Type deviceType;
+	@Column(name = "devicetype")
+	private String deviceType;
 	@ManyToOne
 	@JoinColumn(name="deviceroom")
 	@JsonIgnore
@@ -38,8 +38,9 @@ public class Device {
 		
 	}
 	
-	public Device(String label) {
+	public Device(String label, String deviceType) {
 		this.label = label;
+		this.deviceType = deviceType;
 		this.groupAddresses = new ArrayList<>();
 	}
 
@@ -63,11 +64,19 @@ public class Device {
 		return room;
 	}
 
-	public void setDeviceType(Type deviceType) {
-		this.deviceType = deviceType;
-	}
-
 	public Long getDeviceid() {
 		return deviceid;
+	}
+
+	public void setDeviceid(Long deviceid) {
+		this.deviceid = deviceid;
+	}
+
+	public String getDeviceType() {
+		return deviceType;
+	}
+
+	public void setDeviceType(String deviceType) {
+		this.deviceType = deviceType;
 	}
 }
