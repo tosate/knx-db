@@ -13,6 +13,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.TableGenerator;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sun.istack.NotNull;
 
 @Entity
 public class Room {
@@ -22,7 +23,9 @@ public class Room {
 			pkColumnName="name", valueColumnName="seq",
 			pkColumnValue="room")
 	private Long roomid;
+	@NotNull
 	private String name;
+	@NotNull
 	private String label;
 	private String floor;
 	@ManyToOne

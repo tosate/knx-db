@@ -10,6 +10,7 @@ import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sun.istack.NotNull;
 
 import de.devtom.java.utils.ServiceUtils;
 
@@ -24,10 +25,13 @@ public class GroupAddress {
 	@Column(name = "groupaddressid")
 	private Long groupAddressId;
 	@Column(name = "maingroup")
+	@NotNull
 	private int mainGroup;
 	@Column(name = "middlegroup")
+	@NotNull
 	private int middleGroup;
 	@Column(name = "subgroup")
+	@NotNull
 	private int subGroup;
 	@Column(name = "datatype")
 	private String dataType;

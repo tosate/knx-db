@@ -10,6 +10,10 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.TableGenerator;
 
+import com.sun.istack.NotNull;
+
+import io.swagger.annotations.ApiModelProperty;
+
 @Entity
 public class Project {
 	@Id
@@ -18,6 +22,8 @@ public class Project {
 			pkColumnName="name", valueColumnName="seq",
 			pkColumnValue="project")
 	private Long projectid;
+	@NotNull
+	@ApiModelProperty(value = "Project name")
 	private String name;
 	@OneToMany(fetch = FetchType.EAGER, mappedBy="project")
 	private List<Room> rooms;

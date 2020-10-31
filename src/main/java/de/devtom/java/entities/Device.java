@@ -14,6 +14,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.TableGenerator;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sun.istack.NotNull;
 
 @Entity
 public class Device {
@@ -23,8 +24,10 @@ public class Device {
 			pkColumnName="name", valueColumnName="seq",
 			pkColumnValue="device")
 	private Long deviceid;
+	@NotNull
 	private String label;
 	@Column(name = "devicetype")
+	@NotNull
 	private String deviceType;
 	@ManyToOne
 	@JoinColumn(name="deviceroom")

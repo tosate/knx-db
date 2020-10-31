@@ -1,5 +1,7 @@
 package de.devtom.java.rest.controllers;
 
+import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
+
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -20,7 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import de.devtom.java.entities.Project;
 import de.devtom.java.services.ProjectService;
-import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @RestController
 @RequestMapping(BASE_PATH)
@@ -29,6 +33,13 @@ public class ProjectController {
 	@Autowired
 	private ProjectService projectService;
 	
+	@ApiOperation(value = "create a project instance",
+			consumes = MediaType.APPLICATION_JSON_VALUE,
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiResponses(value = {
+			@ApiResponse(code = 201, message = "New project instance created", response = Project.class),
+			@ApiResponse(code = 400, message = "Empty mandatory field or project already exists")
+	})
 	@PostMapping(value = "/project", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Project> createProject(@RequestBody Project project) {
 		ResponseEntity<Project> response = null;
@@ -48,6 +59,12 @@ public class ProjectController {
 		return response;
 	}
 	
+	@ApiOperation(value = "Get project instance by projectid", 
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Project instance found", response = Project.class),
+			@ApiResponse(code = 404, message = "Project insatnce no found")
+	})
 	@GetMapping(value = "/project/{projectid}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Project> getProject(@PathVariable Long projectid) {
 		ResponseEntity<Project> response = null;
@@ -62,8 +79,16 @@ public class ProjectController {
 		return response;
 	}
 	
+	@ApiOperation(value = "Replace existing project instance",
+			consumes = MediaType.APPLICATION_JSON_VALUE,
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiResponses(value = {
+		@ApiResponse(code = 200, message = "Project instance replaced", response = Project.class),
+		@ApiResponse(code = 400, message = "Empty mandatory field"),
+		@ApiResponse(code = 404, message = "Project instance to replace not found")
+	})
 	@PutMapping(value = "/project/{projectid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Project> updateProject(@PathVariable Long projectid, @RequestBody Project project) {
+	public ResponseEntity<Project> replaceExistingProject(@PathVariable Long projectid, @RequestBody Project project) {
 		ResponseEntity<Project> response = null;
 		try {
 			validateProjectName(project);
@@ -82,6 +107,12 @@ public class ProjectController {
 		return response;
 	}
 	
+	@ApiOperation(value = "Delete project instance",
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Project instance deleted", response = Project.class),
+			@ApiResponse(code = 404, message = "Project to delete not found")
+	})
 	@DeleteMapping(value = "/project/{projectid}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Project> deleteProject(@PathVariable Long projectid) {
 		ResponseEntity<Project> response = null;
