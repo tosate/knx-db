@@ -37,7 +37,7 @@ public class DeviceController {
 	@Autowired
 	private ProjectService projectService;
 	
-	@PostMapping(value = "/project/{projectid}/room/{roomid}/device", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/projects/{projectid}/rooms/{roomid}/devices", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Device> createDevice(@PathVariable Long projectid, @PathVariable Long roomid, @RequestBody Device device) {
 		ResponseEntity<Device> response = null;
 		try {
@@ -58,7 +58,7 @@ public class DeviceController {
 		return response;
 	}
 	
-	@GetMapping(value = "/project/{projectid}/room/{roomid}/device/{deviceid}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Device> getDevice(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid) {
 		ResponseEntity<Device> response = null;
 		try {
@@ -76,7 +76,7 @@ public class DeviceController {
 		return response;
 	}
 	
-	@PutMapping(value = "/project/{projectid}/room/{roomid}/device/{deviceid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PutMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Device> updateDevice(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid, @RequestBody Device device) {
 		ResponseEntity<Device> response = null;
 		try {
@@ -98,7 +98,7 @@ public class DeviceController {
 		return response;
 	}
 	
-	@DeleteMapping(value = "/project/{projectid}/room/{roomid}/device/{deviceid}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@DeleteMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Device> deleteDevice(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid) {
 		ResponseEntity<Device> response = null;
 		try {

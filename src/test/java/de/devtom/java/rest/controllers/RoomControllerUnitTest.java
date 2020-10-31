@@ -29,7 +29,7 @@ public class RoomControllerUnitTest extends AbstractControllerUnitTest {
 	private static final String PROJECT_NAME = "project-name";
 	private static final String ROOM_NAME = "room-name";
 	private static final String ROOM_LABEL = "room-label";
-	private static final String URI = BASE_PATH + "/project/" + PROJECT_ID + "/room";
+	private static final String URI = BASE_PATH + "/projects/" + PROJECT_ID + "/rooms";
 	@MockBean
 	private ProjectService projectService;
 	@MockBean

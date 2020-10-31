@@ -44,7 +44,7 @@ public class RoomController {
 			@ApiResponse(code = 201, message = "New room instance created", response = Room.class),
 			@ApiResponse(code = 400, message = "Empty mandatory fields, room already exists or project not found")
 	})
-	@PostMapping(value = "/project/{projectid}/room", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/projects/{projectid}/rooms", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Room> createRoom(@PathVariable Long projectid, @RequestBody Room room) {
 		ResponseEntity<Room> response = null;
 		try {
@@ -70,7 +70,7 @@ public class RoomController {
 			@ApiResponse(code = 400, message = "Parent project not found"),
 			@ApiResponse(code = 404, message = "Room instance not found")
 	})
-	@GetMapping(value = "/project/{projectid}/room/{roomid}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/projects/{projectid}/rooms/{roomid}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Room> getRoom(@PathVariable Long projectid, @PathVariable Long roomid) {
 		ResponseEntity<Room> response = null;
 		try {
@@ -108,7 +108,7 @@ public class RoomController {
 			@ApiResponse(code = 400, message = "Parent project not found"),
 			@ApiResponse(code = 404, message = "Room instance to replace not found")
 	})
-	@PutMapping(value = "/project/{projectid}/room/{roomid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PutMapping(value = "/projects/{projectid}/rooms/{roomid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Room> replaceExistingRoom(@PathVariable Long projectid, @PathVariable Long roomid, @RequestBody Room room) {
 		ResponseEntity<Room> response = null;
 		try {
@@ -135,7 +135,7 @@ public class RoomController {
 			@ApiResponse(code = 400, message = "Parent project not found"),
 			@ApiResponse(code = 404, message = "Room to delete not found")
 	})
-	@DeleteMapping(value = "/project/{projectid}/room/{roomid}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@DeleteMapping(value = "/projects/{projectid}/rooms/{roomid}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Room> deleteRoom(@PathVariable Long projectid, @PathVariable Long roomid) {
 		ResponseEntity<Room> response = null;
 		try {

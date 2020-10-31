@@ -37,7 +37,7 @@ public class GroupAddressController {
 	@Autowired
 	private ProjectService projectService;
 	
-	@PostMapping(value = "/project/{projectid}/room/{roomid}/device/{deviceid}/group-address", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}/group-addresses", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<GroupAddress> createGroupAddress(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid, @RequestBody GroupAddress groupAddress) {
 		ResponseEntity<GroupAddress> response = null;
 		try {
@@ -58,7 +58,7 @@ public class GroupAddressController {
 		return response;
 	}
 	
-	@GetMapping(value = "/project/{projectid}/room/{roomid}/device/{deviceid}/group-address/{groupaddressid}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}/group-addresses/{groupaddressid}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<GroupAddress> getGroupAddress(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid, @PathVariable Long groupaddressid) {
 		ResponseEntity<GroupAddress> response = null;
 		try {
@@ -77,7 +77,7 @@ public class GroupAddressController {
 		return response;
 	}
 	
-	@PutMapping(value = "/project/{projectid}/room/{roomid}/device/{deviceid}/group-address/{groupaddressid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PutMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}/group-addresses/{groupaddressid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<GroupAddress> updateGroupAddress(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid, @PathVariable Long groupaddressid, @RequestBody GroupAddress groupAddress) {
 		ResponseEntity<GroupAddress> response = null;
 		
@@ -100,7 +100,7 @@ public class GroupAddressController {
 		return response;
 	}
 	
-	@DeleteMapping(value = "/project/{projectid}/room/{roomid}/device/{deviceid}/group-address/{groupaddressid}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@DeleteMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}/group-addresses/{groupaddressid}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<GroupAddress> deleteGroupAddress(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid, @PathVariable Long groupaddressid) {
 		ResponseEntity<GroupAddress> response = null;
 		try {

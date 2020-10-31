@@ -22,7 +22,7 @@ import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
 
 @ContextConfiguration(classes = {ProjectController.class})
 public class ProjectControllerUnitTest extends AbstractControllerUnitTest {
-	private static final String URI = BASE_PATH + "/project";
+	private static final String URI = BASE_PATH + "/projects";
 	@MockBean
 	private ProjectService projectService;
 	

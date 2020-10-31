@@ -38,7 +38,7 @@ public class ProjectController {
 			@ApiResponse(code = 201, message = "New project instance created", response = Project.class),
 			@ApiResponse(code = 400, message = "Empty mandatory field or project already exists")
 	})
-	@PostMapping(value = "/project", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/projects", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Project> createProject(@RequestBody Project project) {
 		ResponseEntity<Project> response = null;
 		try {
@@ -62,7 +62,7 @@ public class ProjectController {
 			@ApiResponse(code = 200, message = "Project instance found", response = Project.class),
 			@ApiResponse(code = 404, message = "Project insatnce no found")
 	})
-	@GetMapping(value = "/project/{projectid}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/projects/{projectid}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Project> getProject(@PathVariable Long projectid) {
 		ResponseEntity<Project> response = null;
 		Optional<Project> project = projectService.findById(projectid);
@@ -82,7 +82,7 @@ public class ProjectController {
 		@ApiResponse(code = 400, message = "Empty mandatory field"),
 		@ApiResponse(code = 404, message = "Project instance to replace not found")
 	})
-	@PutMapping(value = "/project/{projectid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PutMapping(value = "/projects/{projectid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Project> replaceExistingProject(@PathVariable Long projectid, @RequestBody Project project) {
 		ResponseEntity<Project> response = null;
 		try {
@@ -107,7 +107,7 @@ public class ProjectController {
 			@ApiResponse(code = 200, message = "Project instance deleted", response = Project.class),
 			@ApiResponse(code = 404, message = "Project to delete not found")
 	})
-	@DeleteMapping(value = "/project/{projectid}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@DeleteMapping(value = "/projects/{projectid}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Project> deleteProject(@PathVariable Long projectid) {
 		ResponseEntity<Project> response = null;
 		Optional<Project> existingProject = projectService.findById(projectid);
