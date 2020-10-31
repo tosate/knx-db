@@ -104,7 +104,7 @@ public class RoomController {
 
 	@ApiOperation(value = "Replace existing room instace")
 	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Room instance found", response = Room.class),
+			@ApiResponse(code = 200, message = "Room instance replaced", response = Room.class),
 			@ApiResponse(code = 400, message = "Parent project not found"),
 			@ApiResponse(code = 404, message = "Room instance to replace not found")
 	})

@@ -26,6 +26,9 @@ import de.devtom.java.entities.Project;
 import de.devtom.java.entities.Room;
 import de.devtom.java.services.GroupAddressService;
 import de.devtom.java.services.ProjectService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @RestController
 @RequestMapping(BASE_PATH)
@@ -37,6 +40,10 @@ public class GroupAddressController {
 	@Autowired
 	private ProjectService projectService;
 	
+	@ApiOperation(value = "create group address instance")
+	@ApiResponses(value = {
+			@ApiResponse(code = 201, message = "New group address instance created", response = GroupAddress.class)
+	})
 	@PostMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}/group-addresses", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<GroupAddress> createGroupAddress(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid, @RequestBody GroupAddress groupAddress) {
 		ResponseEntity<GroupAddress> response = null;
@@ -58,6 +65,12 @@ public class GroupAddressController {
 		return response;
 	}
 	
+	@ApiOperation(value = "get group address by groupaddressid")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Group address instance found", response = GroupAddress.class),
+			@ApiResponse(code = 400, message = "Parent element not found"),
+			@ApiResponse(code = 404, message = "Group address not found")
+	})
 	@GetMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}/group-addresses/{groupaddressid}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<GroupAddress> getGroupAddress(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid, @PathVariable Long groupaddressid) {
 		ResponseEntity<GroupAddress> response = null;
@@ -77,8 +90,14 @@ public class GroupAddressController {
 		return response;
 	}
 	
+	@ApiOperation(value = "Replace existing group address instance")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Group address replaced", response = GroupAddress.class),
+			@ApiResponse(code = 400, message = "Parent element not found"),
+			@ApiResponse(code = 404, message = "Group address instance to replace not found")
+	})
 	@PutMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}/group-addresses/{groupaddressid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<GroupAddress> updateGroupAddress(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid, @PathVariable Long groupaddressid, @RequestBody GroupAddress groupAddress) {
+	public ResponseEntity<GroupAddress> replaceExistingGroupAddress(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid, @PathVariable Long groupaddressid, @RequestBody GroupAddress groupAddress) {
 		ResponseEntity<GroupAddress> response = null;
 		
 		try {
@@ -100,6 +119,12 @@ public class GroupAddressController {
 		return response;
 	}
 	
+	@ApiOperation(value = "Delete group address instance")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Group address instance deleted", response = GroupAddress.class),
+			@ApiResponse(code = 400, message = "Parent element not found"),
+			@ApiResponse(code = 404, message = "Group address to delete not found")
+	})
 	@DeleteMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}/group-addresses/{groupaddressid}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<GroupAddress> deleteGroupAddress(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid, @PathVariable Long groupaddressid) {
 		ResponseEntity<GroupAddress> response = null;

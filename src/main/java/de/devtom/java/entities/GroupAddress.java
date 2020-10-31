@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 
 import de.devtom.java.utils.ServiceUtils;
+import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @Table(name = "groupaddress")
@@ -26,15 +27,20 @@ public class GroupAddress {
 	private Long groupAddressId;
 	@Column(name = "maingroup")
 	@NotNull
+	@ApiModelProperty("KNX main group")
 	private int mainGroup;
 	@Column(name = "middlegroup")
 	@NotNull
+	@ApiModelProperty(value = "KNX middle group")
 	private int middleGroup;
 	@Column(name = "subgroup")
 	@NotNull
+	@ApiModelProperty(value = "KNX sub group")
 	private int subGroup;
 	@Column(name = "datatype")
+	@ApiModelProperty(value = "KNX data type")
 	private String dataType;
+	@ApiModelProperty(value = "Function description of this address")
 	private String function;
 	@ManyToOne
 	@JoinColumn(name="groupaddressdevice")

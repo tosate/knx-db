@@ -10,8 +10,6 @@ import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.async.DeferredResult;
 
@@ -19,7 +17,6 @@ import com.fasterxml.classmate.TypeResolver;
 
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.builders.ResponseBuilder;
 import springfox.documentation.schema.ScalarType;
 import springfox.documentation.schema.WildcardType;
 import springfox.documentation.service.ApiInfo;
@@ -50,7 +47,7 @@ public class KnxDbApplicationConfiguration {
 
 	@Bean
 	public Docket api() {
-		return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select().apis(RequestHandlerSelectors.any())
+		return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select().apis(RequestHandlerSelectors.basePackage("de.devtom.java.rest.controllers"))
 				.paths(PathSelectors.any()).build().pathMapping("/")
 				.directModelSubstitute(LocalDate.class, String.class).genericModelSubstitutes(ResponseEntity.class)
 				.alternateTypeRules(newRule(
@@ -58,13 +55,6 @@ public class KnxDbApplicationConfiguration {
 								typeResolver.resolve(ResponseEntity.class, WildcardType.class)),
 						typeResolver.resolve(WildcardType.class)))
 				.useDefaultResponseMessages(false)
-				.globalResponses(HttpMethod.GET, singletonList(new ResponseBuilder().code("500")
-						.description("500 message").representation(MediaType.TEXT_XML)
-						.apply(r -> r.model(m -> m.referenceModel(ref -> ref
-								.key(k -> k.qualifiedModelName(q -> q.namespace("some:namespace").name("ERROR"))))))
-						.build()))
-//		        .securitySchemes(singletonList(apiKey())) 
-//		        .securityContexts(singletonList(securityContext())) 
 				.enableUrlTemplating(true)
 				.globalRequestParameters(singletonList(
 						new springfox.documentation.builders.RequestParameterBuilder().name("someGlobalParameter")

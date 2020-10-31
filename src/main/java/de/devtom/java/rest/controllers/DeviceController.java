@@ -21,6 +21,9 @@ import de.devtom.java.entities.Project;
 import de.devtom.java.entities.Room;
 import de.devtom.java.services.DeviceService;
 import de.devtom.java.services.ProjectService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
 
@@ -37,6 +40,11 @@ public class DeviceController {
 	@Autowired
 	private ProjectService projectService;
 	
+	@ApiOperation(value = "create device instance")
+	@ApiResponses(value = {
+			@ApiResponse(code = 201, message = "New device instance created", response = Device.class),
+			@ApiResponse(code = 400, message = "Empty mandatory fields, device alredy exists or parent elements not found")
+	})
 	@PostMapping(value = "/projects/{projectid}/rooms/{roomid}/devices", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Device> createDevice(@PathVariable Long projectid, @PathVariable Long roomid, @RequestBody Device device) {
 		ResponseEntity<Device> response = null;
@@ -57,7 +65,13 @@ public class DeviceController {
 		
 		return response;
 	}
-	
+
+	@ApiOperation(value = "get device by deviceid")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Device instance found", response = Device.class),
+			@ApiResponse(code = 400, message = "Parent element not found"),
+			@ApiResponse(code = 404, message = "Device instance not found")
+	})
 	@GetMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Device> getDevice(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid) {
 		ResponseEntity<Device> response = null;
@@ -76,8 +90,14 @@ public class DeviceController {
 		return response;
 	}
 	
+	@ApiOperation(value = "Replace existing device instance")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Device instance replaced"),
+			@ApiResponse(code = 400, message = "Parent element not found"),
+			@ApiResponse(code = 404, message = "Device instance to replace not found") 
+	})
 	@PutMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Device> updateDevice(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid, @RequestBody Device device) {
+	public ResponseEntity<Device> replaceExistingDevice(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid, @RequestBody Device device) {
 		ResponseEntity<Device> response = null;
 		try {
 			validateDeviceFields(device);
@@ -98,6 +118,12 @@ public class DeviceController {
 		return response;
 	}
 	
+	@ApiOperation(value = "Delete device instance")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Device instance deleted", response = Device.class),
+			@ApiResponse(code = 400, message = "Parent element not found"),
+			@ApiResponse(code = 404, message = "Device to delete not found")
+	})
 	@DeleteMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Device> deleteDevice(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid) {
 		ResponseEntity<Device> response = null;

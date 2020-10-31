@@ -16,6 +16,8 @@ import javax.persistence.TableGenerator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 
+import io.swagger.annotations.ApiModelProperty;
+
 @Entity
 public class Device {
 	@Id
@@ -25,9 +27,11 @@ public class Device {
 			pkColumnValue="device")
 	private Long deviceid;
 	@NotNull
+	@ApiModelProperty(value = "Device label")
 	private String label;
 	@Column(name = "devicetype")
 	@NotNull
+	@ApiModelProperty(value = "Device type specifier")
 	private String deviceType;
 	@ManyToOne
 	@JoinColumn(name="deviceroom")
