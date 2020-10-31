@@ -2,6 +2,8 @@ package de.devtom.java.rest.controllers;
 
 import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.devtom.java.entities.Project;
@@ -71,6 +74,26 @@ public class ProjectController {
 		} else {
 			LOGGER.error("No project with ID [{}]", projectid);
 			response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		
+		return response;
+	}
+	
+	@ApiOperation(value = "Get project list. A single project can be retrieve by name overa query parameter")
+	@ApiResponse(code = 200, message = "List of projects", response = List.class)
+	@GetMapping(value = "/projects", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<Project>> getProjectList(@RequestParam(required = false) String name) {
+		ResponseEntity<List<Project>> response = null;
+		if(StringUtils.isEmpty(name)) {
+			response = new ResponseEntity<>(projectService.list(), HttpStatus.OK);
+		} else {
+			List<Project> result = new ArrayList<>();
+			for(Project project : projectService.list()) {
+				if(project.getName().equals(name)) {
+					result.add(project);
+				}
+			}
+			response = new ResponseEntity<>(result, HttpStatus.OK);
 		}
 		
 		return response;

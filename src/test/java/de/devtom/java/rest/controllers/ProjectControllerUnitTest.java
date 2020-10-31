@@ -3,6 +3,8 @@ package de.devtom.java.rest.controllers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -96,6 +98,34 @@ public class ProjectControllerUnitTest extends AbstractControllerUnitTest {
 			validateHttpStatus(HttpStatus.OK, mvcResult);
 			String content = mvcResult.getResponse().getContentAsString();
 			String outputJson = mapToJson(project);
+			assertEquals(outputJson, content);
+		} catch (JsonProcessingException e) {
+			fail(e.getMessage());
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testGetProjectList() {
+		List<Project> projectList = new ArrayList<>();
+		Project project1 = new Project("project1");
+		project1.setProjectid(1l);
+		projectList.add(project1);
+		String nameProject2 = "project2";
+		Project project2 = new Project(nameProject2);
+		project2.setProjectid(2l);
+		projectList.add(project2);
+		
+		try {
+			Mockito.when(projectService.list()).thenReturn(projectList);
+			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(URI + "?name=" + nameProject2)).andReturn();
+			Mockito.verify(projectService, Mockito.times(1)).list();
+			
+			validateHttpStatus(HttpStatus.OK, mvcResult);
+			String content = mvcResult.getResponse().getContentAsString();
+			projectList.remove(project1);
+			String outputJson = mapToJson(projectList);
 			assertEquals(outputJson, content);
 		} catch (JsonProcessingException e) {
 			fail(e.getMessage());
