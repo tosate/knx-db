@@ -33,9 +33,7 @@ public class ProjectController {
 	@Autowired
 	private ProjectService projectService;
 	
-	@ApiOperation(value = "create a project instance",
-			consumes = MediaType.APPLICATION_JSON_VALUE,
-			produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "create a project instance")
 	@ApiResponses(value = {
 			@ApiResponse(code = 201, message = "New project instance created", response = Project.class),
 			@ApiResponse(code = 400, message = "Empty mandatory field or project already exists")
@@ -59,8 +57,7 @@ public class ProjectController {
 		return response;
 	}
 	
-	@ApiOperation(value = "Get project instance by projectid", 
-			produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Get project instance by projectid")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Project instance found", response = Project.class),
 			@ApiResponse(code = 404, message = "Project insatnce no found")
@@ -79,9 +76,7 @@ public class ProjectController {
 		return response;
 	}
 	
-	@ApiOperation(value = "Replace existing project instance",
-			consumes = MediaType.APPLICATION_JSON_VALUE,
-			produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Replace existing project instance")
 	@ApiResponses(value = {
 		@ApiResponse(code = 200, message = "Project instance replaced", response = Project.class),
 		@ApiResponse(code = 400, message = "Empty mandatory field"),
@@ -107,8 +102,7 @@ public class ProjectController {
 		return response;
 	}
 	
-	@ApiOperation(value = "Delete project instance",
-			produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Delete project instance")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Project instance deleted", response = Project.class),
 			@ApiResponse(code = 404, message = "Project to delete not found")

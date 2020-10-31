@@ -15,17 +15,21 @@ import javax.persistence.TableGenerator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 
+import io.swagger.annotations.ApiModelProperty;
+
 @Entity
 public class Room {
 	@Id
 	@GeneratedValue(generator = "sqlite")
-	@TableGenerator(name = "sqlite", table="sqlite_sequence",
+	@TableGenerator(name = "room_id_generator", table="sqlite_sequence",
 			pkColumnName="name", valueColumnName="seq",
 			pkColumnValue="room")
 	private Long roomid;
 	@NotNull
+	@ApiModelProperty(value = "Room name")
 	private String name;
 	@NotNull
+	@ApiModelProperty(value = "Room label")
 	private String label;
 	private String floor;
 	@ManyToOne

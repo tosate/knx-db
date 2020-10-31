@@ -9,7 +9,6 @@ import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -29,27 +28,20 @@ import springfox.documentation.service.ParameterType;
 import springfox.documentation.service.VendorExtension;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger.web.DocExpansion;
-import springfox.documentation.swagger.web.ModelRendering;
-import springfox.documentation.swagger.web.OperationsSorter;
-import springfox.documentation.swagger.web.TagsSorter;
-import springfox.documentation.swagger.web.UiConfiguration;
-import springfox.documentation.swagger.web.UiConfigurationBuilder;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
 @EnableSwagger2
-@ComponentScan(basePackages = { "de.devtom.java.controllers" })
 public class KnxDbApplicationConfiguration {
 	public static final String BASE_PATH = "/knx-db";
 	private static final String API_TITLE = "KNX DB API";
 	private static final String API_DESCRIPTION = "API to access and modify a basic KNX database";
 	private static final String API_VERSION = "1.0.0";
-	private static final String API_TERMS_OF_SERVICE_URL = "None";
+	private static final String API_TERMS_OF_SERVICE_URL = null;
 	private static final Contact API_CONTACT = new Contact("KNX DB API Team", "http://devtom.de",
 			"knx-db-api@devtom.de");
-	private static final String API_LICENSE = "None";
-	private static final String API_LICENSE_URL = "None";
+	private static final String API_LICENSE = null;
+	private static final String API_LICENSE_URL = null;
 	@SuppressWarnings("rawtypes")
 	private static final Collection<VendorExtension> API_VENDOR_EXTENSIONS = new ArrayList<>();
 

@@ -24,7 +24,7 @@ public class RoomService {
 		return roomRepository.save(room);
 	}
 	
-	public Room update(Room room) {
+	public Room replace(Room room) {
 		return roomRepository.save(room);
 	}
 	

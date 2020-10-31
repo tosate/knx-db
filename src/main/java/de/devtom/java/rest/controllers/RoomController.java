@@ -23,6 +23,9 @@ import de.devtom.java.entities.Project;
 import de.devtom.java.entities.Room;
 import de.devtom.java.services.ProjectService;
 import de.devtom.java.services.RoomService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
 
@@ -36,6 +39,11 @@ public class RoomController {
 	@Autowired
 	private ProjectService projectService;
 	
+	@ApiOperation(value = "create a room instance")
+	@ApiResponses(value = {
+			@ApiResponse(code = 201, message = "New room instance created", response = Room.class),
+			@ApiResponse(code = 400, message = "Empty mandatory fields, room already exists or project not found")
+	})
 	@PostMapping(value = "/project/{projectid}/room", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Room> createRoom(@PathVariable Long projectid, @RequestBody Room room) {
 		ResponseEntity<Room> response = null;
@@ -56,6 +64,12 @@ public class RoomController {
 		return response;
 	}
 	
+	@ApiOperation(value = "get room by roomid")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Room instance found", response = Room.class),
+			@ApiResponse(code = 400, message = "Parent project not found"),
+			@ApiResponse(code = 404, message = "Room instance not found")
+	})
 	@GetMapping(value = "/project/{projectid}/room/{roomid}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Room> getRoom(@PathVariable Long projectid, @PathVariable Long roomid) {
 		ResponseEntity<Room> response = null;
@@ -88,8 +102,14 @@ public class RoomController {
 		}
 	}
 
+	@ApiOperation(value = "Replace existing room instace")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Room instance found", response = Room.class),
+			@ApiResponse(code = 400, message = "Parent project not found"),
+			@ApiResponse(code = 404, message = "Room instance to replace not found")
+	})
 	@PutMapping(value = "/project/{projectid}/room/{roomid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Room> updateRoom(@PathVariable Long projectid, @PathVariable Long roomid, @RequestBody Room room) {
+	public ResponseEntity<Room> replaceExistingRoom(@PathVariable Long projectid, @PathVariable Long roomid, @RequestBody Room room) {
 		ResponseEntity<Room> response = null;
 		try {
 			validateRoomFields(room);
@@ -97,7 +117,7 @@ public class RoomController {
 			Room existingRoom = retrieveExistingRoom(project, roomid);
 			room.setRoomid(existingRoom.getRoomid());
 			room.setProject(existingRoom.getProject());
-			response = new ResponseEntity<>(roomService.update(room), HttpStatus.OK);
+			response = new ResponseEntity<>(roomService.replace(room), HttpStatus.OK);
 		} catch (IllegalArgumentException e) {
 			LOGGER.error("Invalid input: {}", e.getMessage());
 			response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -109,6 +129,12 @@ public class RoomController {
 		return response;
 	}
 	
+	@ApiOperation(value = "Delete room instace")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Room instance deleted", response = Room.class),
+			@ApiResponse(code = 400, message = "Parent project not found"),
+			@ApiResponse(code = 404, message = "Room to delete not found")
+	})
 	@DeleteMapping(value = "/project/{projectid}/room/{roomid}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Room> deleteRoom(@PathVariable Long projectid, @PathVariable Long roomid) {
 		ResponseEntity<Room> response = null;
