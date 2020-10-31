@@ -11,9 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -63,7 +65,7 @@ public class GroupAddressController {
 			Project project = getProject(projectid);
 			Room room = getRoom(project, roomid);
 			Device device = getDevice(room, deviceid);
-			response = new ResponseEntity<>(retieveExistingGroupAddress(device, groupaddressid), HttpStatus.OK);
+			response = new ResponseEntity<>(retrieveExistingGroupAddress(device, groupaddressid), HttpStatus.OK);
 		} catch (IllegalArgumentException e) {
 			LOGGER.error("Invalid input: {}", e.getMessage());
 			response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -75,7 +77,51 @@ public class GroupAddressController {
 		return response;
 	}
 	
-	private GroupAddress retieveExistingGroupAddress(Device device, Long groupaddressid) throws UnknownObjectException {
+	@PutMapping(value = "/project/{projectid}/room/{roomid}/device/{deviceid}/group-address/{groupaddressid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<GroupAddress> updateGroupAddress(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid, @PathVariable Long groupaddressid, @RequestBody GroupAddress groupAddress) {
+		ResponseEntity<GroupAddress> response = null;
+		
+		try {
+			Project project = getProject(projectid);
+			Room room = getRoom(project, roomid);
+			Device device = getDevice(room, deviceid);
+			GroupAddress existingGroupAddress = retrieveExistingGroupAddress(device, groupaddressid);
+			groupAddress.setGroupAddressId(existingGroupAddress.getGroupAddressId());
+			groupAddress.setDevice(device);
+			response = new ResponseEntity<GroupAddress>(groupAddressService.update(groupAddress), HttpStatus.OK);
+		} catch (IllegalArgumentException e) {
+			LOGGER.error("Invalid input: {}", e.getMessage());
+			response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		} catch (UnknownObjectException e) {
+			LOGGER.error(e.getMessage());
+			response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		
+		return response;
+	}
+	
+	@DeleteMapping(value = "/project/{projectid}/room/{roomid}/device/{deviceid}/group-address/{groupaddressid}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<GroupAddress> deleteGroupAddress(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid, @PathVariable Long groupaddressid) {
+		ResponseEntity<GroupAddress> response = null;
+		try {
+			Project project = getProject(projectid);
+			Room room = getRoom(project, roomid);
+			Device device = getDevice(room, deviceid);
+			GroupAddress existingGrouAddress = retrieveExistingGroupAddress(device, groupaddressid);
+			groupAddressService.delete(existingGrouAddress);
+			response = new ResponseEntity<>(existingGrouAddress, HttpStatus.OK);
+		} catch (IllegalArgumentException e) {
+			LOGGER.error("Invalid input: {}", e.getMessage());
+			response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		} catch (UnknownObjectException e) {
+			LOGGER.error(e.getMessage());
+			response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		
+		return response;
+	}
+	
+	private GroupAddress retrieveExistingGroupAddress(Device device, Long groupaddressid) throws UnknownObjectException {
 		Optional<GroupAddress> result = Optional.empty();
 		for(GroupAddress address : device.getGroupAddresses()) {
 			if(address.getGroupAddressId().equals(groupaddressid)) {

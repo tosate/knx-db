@@ -22,6 +22,10 @@ public class GroupAddressService {
 		parentDevice.addAddress(address);
 		return groupAddressRepository.save(address);
 	}
+	
+	public GroupAddress update(GroupAddress address) {
+		return groupAddressRepository.save(address);
+	}
 
 	public void delete(GroupAddress savedAddress) {
 		savedAddress.getDevice().deleteAddress(savedAddress);

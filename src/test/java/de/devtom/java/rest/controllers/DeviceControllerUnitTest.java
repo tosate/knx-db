@@ -152,10 +152,10 @@ public class DeviceControllerUnitTest extends AbstractControllerUnitTest {
 		updatedDevice.setDeviceid(DEVICE_ID);
 		
 		try {
-			String inputJString = mapToJson(updatedDevice);
+			String inputJson = mapToJson(updatedDevice);
 			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(Optional.of(project));
 			Mockito.when(deviceService.update(Mockito.any(Device.class))).thenReturn(updatedDevice);
-			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(URI + "/" + DEVICE_ID).contentType(MediaType.APPLICATION_JSON_VALUE).content(inputJString)).andReturn();
+			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(URI + "/" + DEVICE_ID).contentType(MediaType.APPLICATION_JSON_VALUE).content(inputJson)).andReturn();
 			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
 			Mockito.verify(deviceService, Mockito.times(1)).update(Mockito.any(Device.class));
 			

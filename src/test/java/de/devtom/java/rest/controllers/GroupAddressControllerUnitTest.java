@@ -106,4 +106,94 @@ public class GroupAddressControllerUnitTest extends AbstractControllerUnitTest {
 			fail(e.getMessage());
 		}
 	}
+	
+	@Test
+	public void testGetGroupAddressNotExistent() {
+		Project project = new Project(PROJECT_NAME);
+		project.setProjectid(PROJECT_ID);
+		Room room = new Room(ROOM_NAME, ROOM_LABEL);
+		room.setRoomid(ROOM_ID);
+		project.addRoom(room);
+		Device device = new Device(DEVICE_LABEL, DEVICE_TYPE);
+		device.setDeviceid(DEVICE_ID);
+		room.addDevice(device);
+		
+		try {
+			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(Optional.of(project));
+			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(URI + "/" + GROUP_ADDRESS_ID)).andReturn();
+			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
+			
+			validateHttpStatus(HttpStatus.NOT_FOUND, mvcResult);
+		} catch (JsonProcessingException e) {
+			fail(e.getMessage());
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testUpdateGroupAddress() {
+		Project project = new Project(PROJECT_NAME);
+		project.setProjectid(PROJECT_ID);
+		Room room = new Room(ROOM_NAME, ROOM_LABEL);
+		room.setRoomid(ROOM_ID);
+		project.addRoom(room);
+		Device device = new Device(DEVICE_LABEL, DEVICE_TYPE);
+		device.setDeviceid(DEVICE_ID);
+		room.addDevice(device);
+		GroupAddress address = new GroupAddress(ADDR_MAIN_GROUP, ADDR_MIDDLE_GROUP, ADDR_SUB_GROUP);
+		address.setGroupAddressId(GROUP_ADDRESS_ID);
+		device.addAddress(address);
+		GroupAddress updatedGroupAddress = new GroupAddress(ADDR_MAIN_GROUP, ADDR_MIDDLE_GROUP, 2);
+		updatedGroupAddress.setGroupAddressId(GROUP_ADDRESS_ID);
+		
+		try {
+			String inputJson = mapToJson(updatedGroupAddress);
+			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(Optional.of(project));
+			Mockito.when(groupAddressService.update(Mockito.any(GroupAddress.class))).thenReturn(updatedGroupAddress);
+			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(URI + "/" + GROUP_ADDRESS_ID).contentType(MediaType.APPLICATION_JSON_VALUE).content(inputJson)).andReturn();
+			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(groupAddressService, Mockito.times(1)).update(Mockito.any(GroupAddress.class));
+			
+			validateHttpStatus(HttpStatus.OK, mvcResult);
+			String content = mvcResult.getResponse().getContentAsString();
+			String outputJson = mapToJson(updatedGroupAddress);
+			assertEquals(outputJson, content);
+		} catch (JsonProcessingException e) {
+			fail(e.getMessage());
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testDeleteGroupAddress() {
+		Project project = new Project(PROJECT_NAME);
+		project.setProjectid(PROJECT_ID);
+		Room room = new Room(ROOM_NAME, ROOM_LABEL);
+		room.setRoomid(ROOM_ID);
+		project.addRoom(room);
+		Device device = new Device(DEVICE_LABEL, DEVICE_TYPE);
+		device.setDeviceid(DEVICE_ID);
+		room.addDevice(device);
+		GroupAddress address = new GroupAddress(ADDR_MAIN_GROUP, ADDR_MIDDLE_GROUP, ADDR_SUB_GROUP);
+		address.setGroupAddressId(GROUP_ADDRESS_ID);
+		device.addAddress(address);
+		
+		try {
+			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(Optional.of(project));
+			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(URI + "/" + GROUP_ADDRESS_ID)).andReturn();
+			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(groupAddressService, Mockito.times(1)).delete(Mockito.any(GroupAddress.class));
+			
+			validateHttpStatus(HttpStatus.OK, mvcResult);
+			String content = mvcResult.getResponse().getContentAsString();
+			String outputJson = mapToJson(address);
+			assertEquals(outputJson, content);
+		} catch (JsonProcessingException e) {
+			fail(e.getMessage());
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+	}
 }
