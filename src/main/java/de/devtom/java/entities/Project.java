@@ -17,7 +17,7 @@ import io.swagger.annotations.ApiModelProperty;
 @Entity
 public class Project {
 	@Id
-	@GeneratedValue(generator = "sqlite")
+	@GeneratedValue(generator = "project_id_generator")
 	@TableGenerator(name="project_id_generator", table="sqlite_sequence",
 			pkColumnName="name", valueColumnName="seq",
 			pkColumnValue="project")

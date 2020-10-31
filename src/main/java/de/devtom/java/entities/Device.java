@@ -21,8 +21,8 @@ import io.swagger.annotations.ApiModelProperty;
 @Entity
 public class Device {
 	@Id
-	@GeneratedValue(generator = "sqlite")
-	@TableGenerator(name = "sqlite", table="sqlite_sequence",
+	@GeneratedValue(generator = "device_id_generator")
+	@TableGenerator(name = "device_id_generator", table="sqlite_sequence",
 			pkColumnName="name", valueColumnName="seq",
 			pkColumnValue="device")
 	private Long deviceid;

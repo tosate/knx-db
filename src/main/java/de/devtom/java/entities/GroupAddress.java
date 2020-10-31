@@ -19,8 +19,8 @@ import io.swagger.annotations.ApiModelProperty;
 @Table(name = "groupaddress")
 public class GroupAddress {
 	@Id
-	@GeneratedValue(generator = "sqlite")
-	@TableGenerator(name="sqlite", table="sqlite_sequence",
+	@GeneratedValue(generator = "group_address_id_generator")
+	@TableGenerator(name="group_address_id_generator", table="sqlite_sequence",
 			pkColumnName="name", valueColumnName="seq",
 			pkColumnValue="groupaddress")
 	@Column(name = "groupaddressid")

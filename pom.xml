@@ -10,6 +10,7 @@
   </parent>
   <properties>
   	<springfox-boot-starter.version>3.0.0</springfox-boot-starter.version>
+  	<springfox-swagger-ui.versio>3.0.0</springfox-swagger-ui.versio>
   </properties>
   <dependencies>
   	<dependency>
@@ -24,6 +25,11 @@
   		<groupId>io.springfox</groupId>
   		<artifactId>springfox-boot-starter</artifactId>
   		<version>${springfox-boot-starter.version}</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>io.springfox</groupId>
+  		<artifactId>springfox-swagger-ui</artifactId>
+  		<version>${springfox-swagger-ui.versio}</version>
   	</dependency>
   	<!-- https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc -->
 	<dependency>

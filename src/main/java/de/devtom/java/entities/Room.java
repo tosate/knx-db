@@ -20,7 +20,7 @@ import io.swagger.annotations.ApiModelProperty;
 @Entity
 public class Room {
 	@Id
-	@GeneratedValue(generator = "sqlite")
+	@GeneratedValue(generator = "room_id_generator")
 	@TableGenerator(name = "room_id_generator", table="sqlite_sequence",
 			pkColumnName="name", valueColumnName="seq",
 			pkColumnValue="room")

@@ -48,7 +48,7 @@ public class KnxDbApplicationConfiguration {
 	@Bean
 	public Docket api() {
 		return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select().apis(RequestHandlerSelectors.basePackage("de.devtom.java.rest.controllers"))
-				.paths(PathSelectors.any()).build().pathMapping("/")
+				.paths(PathSelectors.any()).build()
 				.directModelSubstitute(LocalDate.class, String.class).genericModelSubstitutes(ResponseEntity.class)
 				.alternateTypeRules(newRule(
 						typeResolver.resolve(DeferredResult.class,
