@@ -4,25 +4,22 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 
 import de.devtom.java.utils.ServiceUtils;
 import io.swagger.annotations.ApiModelProperty;
 
-@Entity
+@Entity(name = "GroupAddress")
 @Table(name = "groupaddress")
 public class GroupAddress {
 	@Id
 	@GeneratedValue(generator = "group_address_id_generator")
 	@TableGenerator(name="group_address_id_generator", table="sqlite_sequence",
 			pkColumnName="name", valueColumnName="seq",
-			pkColumnValue="groupaddress")
+			pkColumnValue="groupaddress", allocationSize = 1)
 	@Column(name = "groupaddressid")
 	private Long groupAddressId;
 	@Column(name = "maingroup")
@@ -42,10 +39,6 @@ public class GroupAddress {
 	private String dataType;
 	@ApiModelProperty(value = "Function description of this address")
 	private String function;
-	@ManyToOne
-	@JoinColumn(name="groupaddressdevice")
-	@JsonIgnore
-	private Device device;
 	
 	protected GroupAddress() {
 		
@@ -55,14 +48,6 @@ public class GroupAddress {
 		this.mainGroup = mainGroup;
 		this.middleGroup = middleGroup;
 		this.subGroup = subGroup;
-	}
-
-	public void setDevice(Device device) {
-		this.device = device;
-	}
-
-	public Device getDevice() {
-		return device;
 	}
 
 	public Long getGroupAddressId() {

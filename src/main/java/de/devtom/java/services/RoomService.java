@@ -32,9 +32,12 @@ public class RoomService {
 		return roomRepository.findById(roomid);
 	}
 	
-	public void delete(Room room) {
-		// remove item from the collection maintained by its parent
-		room.getProject().deleteRoom(room);
+	public void delete(Project project, Room room) {
+		boolean roomRemoved = false;
+		do {
+			roomRemoved = project.getRooms().remove(room);
+		} while(roomRemoved);
+
 		// explicitly delete the record in the database
 		roomRepository.deleteById(room.getRoomid());
 	}

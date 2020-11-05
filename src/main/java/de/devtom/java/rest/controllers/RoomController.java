@@ -116,7 +116,6 @@ public class RoomController {
 			Project project = getProject(projectid);
 			Room existingRoom = retrieveExistingRoom(project, roomid);
 			room.setRoomid(existingRoom.getRoomid());
-			room.setProject(existingRoom.getProject());
 			response = new ResponseEntity<>(roomService.replace(room), HttpStatus.OK);
 		} catch (IllegalArgumentException e) {
 			LOGGER.error("Invalid input: {}", e.getMessage());
@@ -141,7 +140,7 @@ public class RoomController {
 		try {
 			Project project = getProject(projectid);
 			Room existingRoom = retrieveExistingRoom(project, roomid);
-			roomService.delete(existingRoom);
+			roomService.delete(project, existingRoom);
 			response = new ResponseEntity<>(existingRoom, HttpStatus.OK);
 		} catch (IllegalArgumentException e) {
 			LOGGER.error("Invalid input: {}", e.getMessage());

@@ -27,8 +27,8 @@ public class GroupAddressService {
 		return groupAddressRepository.save(address);
 	}
 
-	public void delete(GroupAddress savedAddress) {
-		savedAddress.getDevice().deleteAddress(savedAddress);
+	public void delete(Device device, GroupAddress savedAddress) {
+		device.deleteAddress(savedAddress);
 		groupAddressRepository.deleteById(savedAddress.getGroupAddressId());
 	}
 }

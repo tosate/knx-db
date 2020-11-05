@@ -48,7 +48,7 @@ public class DeviceServiceUnitTest {
 		assertEquals(count + 1, deviceService.list().size());
 		
 		// Delete
-		deviceService.delete(savedDevice);
+		deviceService.delete(room, savedDevice);
 		assertEquals(count, deviceService.list().size());
 	}
 }

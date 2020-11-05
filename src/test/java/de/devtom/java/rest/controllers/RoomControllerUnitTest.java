@@ -42,7 +42,6 @@ public class RoomControllerUnitTest extends AbstractControllerUnitTest {
 		Room room = new Room(ROOM_NAME, ROOM_LABEL);
 		Room savedRoom = new Room(ROOM_NAME, ROOM_LABEL);
 		savedRoom.setRoomid(ROOM_ID);
-		savedRoom.setProject(project);
 		
 		try {
 			String inputJson = mapToJson(room);
@@ -167,7 +166,7 @@ public class RoomControllerUnitTest extends AbstractControllerUnitTest {
 			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(Optional.of(project));
 			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(URI + "/" + ROOM_ID)).andReturn();
 			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
-			Mockito.verify(roomService, Mockito.times(1)).delete(Mockito.any(Room.class));
+			Mockito.verify(roomService, Mockito.times(1)).delete(Mockito.any(Project.class), Mockito.any(Room.class));
 			
 			validateHttpStatus(HttpStatus.OK, mvcResult);
 			String content = mvcResult.getResponse().getContentAsString();

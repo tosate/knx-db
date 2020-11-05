@@ -106,7 +106,6 @@ public class GroupAddressController {
 			Device device = getDevice(room, deviceid);
 			GroupAddress existingGroupAddress = retrieveExistingGroupAddress(device, groupaddressid);
 			groupAddress.setGroupAddressId(existingGroupAddress.getGroupAddressId());
-			groupAddress.setDevice(device);
 			response = new ResponseEntity<GroupAddress>(groupAddressService.update(groupAddress), HttpStatus.OK);
 		} catch (IllegalArgumentException e) {
 			LOGGER.error("Invalid input: {}", e.getMessage());
@@ -133,7 +132,7 @@ public class GroupAddressController {
 			Room room = getRoom(project, roomid);
 			Device device = getDevice(room, deviceid);
 			GroupAddress existingGrouAddress = retrieveExistingGroupAddress(device, groupaddressid);
-			groupAddressService.delete(existingGrouAddress);
+			groupAddressService.delete(device, existingGrouAddress);
 			response = new ResponseEntity<>(existingGrouAddress, HttpStatus.OK);
 		} catch (IllegalArgumentException e) {
 			LOGGER.error("Invalid input: {}", e.getMessage());

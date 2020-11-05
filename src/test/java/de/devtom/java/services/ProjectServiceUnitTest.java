@@ -11,6 +11,7 @@ import de.devtom.java.entities.Project;
 
 @SpringBootTest
 public class ProjectServiceUnitTest {
+	private static final String PROJECT_NAME = "name";
 	@Autowired
 	private ProjectService projectService;
 	
@@ -23,22 +24,23 @@ public class ProjectServiceUnitTest {
 	
 	@Test
 	public void testCreateUpdateDelete() {
-		Project project = new Project("name");
 		
+		Project project = new Project(PROJECT_NAME);
+
 		// Create
 		int count = projectService.list().size();
-		Project savedProject = projectService.save(project);;
+		project = projectService.save(project);;
 		assertEquals(count + 1, projectService.list().size());
-		assertEquals(project.getName(), savedProject.getName());
+		assertEquals(PROJECT_NAME, project.getName());
 		
 		// Update
-		savedProject.setName("alteredName");
-		Project updatedProject = projectService.save(savedProject);
-		assertEquals(savedProject.getProjectid(), updatedProject.getProjectid());
-		assertEquals(savedProject.getName(), updatedProject.getName());
+		String alteredProjectName = "alteredName";
+		project.setName(alteredProjectName);
+		project = projectService.save(project);
+		assertEquals(alteredProjectName, project.getName());
 		
 		// Delete
-		projectService.delete(savedProject);
+		projectService.delete(project);
 		assertEquals(count, projectService.list().size());
 	}
 }

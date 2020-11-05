@@ -3,28 +3,29 @@ package de.devtom.java.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 
 import io.swagger.annotations.ApiModelProperty;
 
-@Entity
+@Entity(name = "Device")
+@Table(name = "device")
 public class Device {
 	@Id
 	@GeneratedValue(generator = "device_id_generator")
 	@TableGenerator(name = "device_id_generator", table="sqlite_sequence",
 			pkColumnName="name", valueColumnName="seq",
-			pkColumnValue="device")
+			pkColumnValue="device", allocationSize = 1)
 	private Long deviceid;
 	@NotNull
 	@ApiModelProperty(value = "Device label")
@@ -33,11 +34,8 @@ public class Device {
 	@NotNull
 	@ApiModelProperty(value = "Device type specifier")
 	private String deviceType;
-	@ManyToOne
-	@JoinColumn(name="deviceroom")
-	@JsonIgnore
-	private Room room;
-	@OneToMany(fetch = FetchType.EAGER, mappedBy="device")
+	@OneToMany(targetEntity = GroupAddress.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JoinColumn(name = "groupaddressdevice", referencedColumnName = "deviceid")
 	private List<GroupAddress> groupAddresses;
 	
 	protected Device() {
@@ -62,14 +60,6 @@ public class Device {
 		return groupAddresses;
 	}
 
-	public void setRoom(Room room) {
-		this.room = room;
-	}
-
-	public Room getRoom() {
-		return room;
-	}
-
 	public Long getDeviceid() {
 		return deviceid;
 	}
@@ -87,11 +77,14 @@ public class Device {
 	}
 
 	public void addAddress(GroupAddress address) {
-		address.setDevice(this);
 		this.groupAddresses.add(address);
 	}
 	
 	public void deleteAddress(GroupAddress address) {
 		this.groupAddresses.remove(address);
+	}
+
+	public void setGroupAddresses(List<GroupAddress> groupAddresses) {
+		this.groupAddresses = groupAddresses;
 	}
 }

@@ -3,27 +3,29 @@ package de.devtom.java.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 
+import de.devtom.java.utils.ServiceUtils;
 import io.swagger.annotations.ApiModelProperty;
 
-@Entity
+@Entity(name = "Room")
+@Table(name = "room")
 public class Room {
 	@Id
 	@GeneratedValue(generator = "room_id_generator")
 	@TableGenerator(name = "room_id_generator", table="sqlite_sequence",
 			pkColumnName="name", valueColumnName="seq",
-			pkColumnValue="room")
+			pkColumnValue="room", allocationSize = 1)
 	private Long roomid;
 	@NotNull
 	@ApiModelProperty(value = "Room name")
@@ -32,11 +34,8 @@ public class Room {
 	@ApiModelProperty(value = "Room label")
 	private String label;
 	private String floor;
-	@ManyToOne
-	@JoinColumn(name="roomproject")
-	@JsonIgnore
-	private Project project;
-	@OneToMany(fetch = FetchType.EAGER, mappedBy="room")
+	@OneToMany(targetEntity = Device.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JoinColumn(name = "deviceroom", referencedColumnName = "roomid")
 	private List<Device> devices;
 	
 	protected Room() {
@@ -74,16 +73,7 @@ public class Room {
 	}
 	
 	public void addDevice(Device device) {
-		device.setRoom(this);
 		this.devices.add(device);
-	}
-
-	public void setProject(Project project) {
-		this.project = project;
-	}
-
-	public Project getProject() {
-		return project;
 	}
 
 	public Long getRoomid() {
@@ -100,5 +90,40 @@ public class Room {
 
 	public List<Device> getDevices() {
 		return devices;
+	}
+
+	public void setDevices(List<Device> devices) {
+		this.devices = devices;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		// If the object is compared with itself then return true   
+        if (obj == this) { 
+            return true; 
+        } 
+  
+        /* Check if o is an instance of Complex or not 
+          "null instanceof [type]" also returns false */
+        if (!(obj instanceof Room)) { 
+            return false; 
+        } 
+          
+        // typecast o to GroupAddress so that we can compare data members
+        Room c = (Room)obj;
+        
+        if(!this.getName().equals(c.getName()) ) {
+        	return false;
+        }
+        
+        if(!this.getLabel().equals(c.getLabel())) {
+        	return false;
+        }
+        
+        if(!ServiceUtils.compare(this.getFloor(), c.getFloor())) {
+        	return false;
+        }
+        
+        return true;
 	}
 }

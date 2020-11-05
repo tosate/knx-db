@@ -39,7 +39,7 @@ public class GroupAddressServiceUnitTest {
 		assertEquals(count + 1, groupAddressSerice.list().size());
 		
 		// Delete
-		groupAddressSerice.delete(savedAddress);
+		groupAddressSerice.delete(device.get(), savedAddress);
 		assertEquals(count, groupAddressSerice.list().size());
 	}
 }

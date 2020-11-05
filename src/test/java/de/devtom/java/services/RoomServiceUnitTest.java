@@ -30,19 +30,22 @@ public class RoomServiceUnitTest {
 	@Test
 	public void testCreateUpdateDelete() {
 		Optional<Project> parentProject = projectService.findById(1l);
-		if(!parentProject.isPresent()) {
+		Project project = null;
+		if(parentProject.isPresent()) {
+			project = parentProject.get();
+		} else {
 			fail("Parent project not found!");
 		}
 		
 		// Create
 		Room room = new Room("name", "label");
 		int count = roomService.list().size();
-		Room savedRoom = roomService.save(parentProject.get(), room);
-		projectService.save(parentProject.get());
+		project.addRoom(room);
+		room = roomService.save(project, room);
 		assertEquals(count + 1, roomService.list().size());
 		
 		// Delete
-		roomService.delete(savedRoom);
+		roomService.delete(project, room);
 		assertEquals(count, roomService.list().size());
 	}
 }

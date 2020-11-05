@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS room (
   name TEXT NOT NULL,
   label TEXT NOT NULL,
   floor TEXT,
-  roomproject INTEGER NOT NULL -- foreign key
+  roomproject INTEGER -- foreign key
 );
 
 CREATE TABLE IF NOT EXISTS device (
@@ -30,5 +30,5 @@ CREATE TABLE IF NOT EXISTS groupaddress (
   subgroup INTEGER NOT NULL,
   datatype TEXT,
   function TEXT,
-  groupaddressdevice INTEGER NOT NULL -- foreign key
+  groupaddressdevice INTEGER -- foreign key
 );

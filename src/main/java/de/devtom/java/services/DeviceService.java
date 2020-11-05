@@ -32,8 +32,8 @@ public class DeviceService {
 		return deviceRepository.findById(deviceid);
 	}
 	
-	public void delete(Device device) {
-		device.getRoom().deleteDevice(device);
+	public void delete(Room room, Device device) {
+		room.deleteDevice(device);
 		deviceRepository.deleteById(device.getDeviceid());
 	}
 }

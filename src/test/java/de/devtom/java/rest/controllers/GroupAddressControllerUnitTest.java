@@ -184,7 +184,7 @@ public class GroupAddressControllerUnitTest extends AbstractControllerUnitTest {
 			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(Optional.of(project));
 			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(URI + "/" + GROUP_ADDRESS_ID)).andReturn();
 			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
-			Mockito.verify(groupAddressService, Mockito.times(1)).delete(Mockito.any(GroupAddress.class));
+			Mockito.verify(groupAddressService, Mockito.times(1)).delete(Mockito.any(Device.class), Mockito.any(GroupAddress.class));
 			
 			validateHttpStatus(HttpStatus.OK, mvcResult);
 			String content = mvcResult.getResponse().getContentAsString();

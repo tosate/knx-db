@@ -185,7 +185,7 @@ public class DeviceControllerUnitTest extends AbstractControllerUnitTest {
 			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(Optional.of(project));
 			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(URI + "/" + DEVICE_ID)).andReturn();
 			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
-			Mockito.verify(deviceService, Mockito.times(1)).delete(Mockito.any(Device.class));
+			Mockito.verify(deviceService, Mockito.times(1)).delete(Mockito.any(Room.class), Mockito.any(Device.class));
 			
 			validateHttpStatus(HttpStatus.OK, mvcResult);
 			String content = mvcResult.getResponse().getContentAsString();
