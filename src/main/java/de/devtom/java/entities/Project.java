@@ -20,6 +20,7 @@ import io.swagger.annotations.ApiModelProperty;
 @Entity(name = "Project")
 @Table(name = "project")
 public class Project {
+	// https://vladmihalcea.com/the-best-way-to-map-a-onetomany-association-with-jpa-and-hibernate/
 	@Id
 	@GeneratedValue(generator = "project_id_generator")
 	@TableGenerator(name="project_id_generator", table="sqlite_sequence",
@@ -33,7 +34,7 @@ public class Project {
 	@JoinColumn(name = "roomproject", referencedColumnName = "projectid")
 	private List<Room> rooms;
 	protected Project() {
-		
+
 	}
 	public Project(String name) {
 		this.name = name;

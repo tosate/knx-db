@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS room (
 CREATE TABLE IF NOT EXISTS device (
   deviceid INTEGER  PRIMARY KEY AUTOINCREMENT,
   label TEXT NOT NULL,
+  nameaffix TEXT,
   devicetype Text NOT NULL,
   deviceroom INTEGER
 );

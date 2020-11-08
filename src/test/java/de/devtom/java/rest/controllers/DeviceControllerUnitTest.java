@@ -33,6 +33,7 @@ public class DeviceControllerUnitTest extends AbstractControllerUnitTest {
 	private static final Long DEVICE_ID = 1l;
 	private static final String DEVICE_LABEL = "device-label";
 	private static final String DEVICE_TYPE = "Lightbulb";
+	private static final String DEVICE_NAME_AFFIX = "GarageBack";
 	private static final String URI = BASE_PATH + "/projects/" + PROJECT_ID + "/rooms/" + ROOM_ID + "/devices";
 	@MockBean
 	private ProjectService projectService;
@@ -47,8 +48,10 @@ public class DeviceControllerUnitTest extends AbstractControllerUnitTest {
 		room.setRoomid(ROOM_ID);
 		project.addRoom(room);
 		Device device = new Device(DEVICE_LABEL, DEVICE_TYPE);
+		device.setNameAffix(DEVICE_NAME_AFFIX);
 		Device savedDevice = new Device(DEVICE_LABEL, DEVICE_TYPE);
 		savedDevice.setDeviceid(DEVICE_ID);
+		savedDevice.setNameAffix(DEVICE_NAME_AFFIX);
 		
 		try {
 			String inputJson = mapToJson(device);

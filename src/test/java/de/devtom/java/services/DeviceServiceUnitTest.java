@@ -16,6 +16,7 @@ import de.devtom.java.entities.Room;
 
 @SpringBootTest
 public class DeviceServiceUnitTest {
+	private static final String NAME_AFFIX = "GarageBack";
 	@Autowired
 	private DeviceService deviceService;
 	@Autowired
@@ -42,8 +43,10 @@ public class DeviceServiceUnitTest {
 		}
 		Room room = project.get().getRooms().get(0);
 		Device device = new Device("device-label", "Lightbulb");
+		device.setNameAffix(NAME_AFFIX);
 		int count = deviceService.list().size();
 		Device savedDevice = deviceService.save(room, device);
+		assertEquals(NAME_AFFIX, savedDevice.getNameAffix());
 		roomService.save(project.get(), room);
 		assertEquals(count + 1, deviceService.list().size());
 		

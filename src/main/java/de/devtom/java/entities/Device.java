@@ -30,6 +30,9 @@ public class Device {
 	@NotNull
 	@ApiModelProperty(value = "Device label")
 	private String label;
+	@Column(name = "nameaffix")
+	@ApiModelProperty(value = "Device name affix")
+	private String nameAffix;
 	@Column(name = "devicetype")
 	@NotNull
 	@ApiModelProperty(value = "Device type specifier")
@@ -86,5 +89,13 @@ public class Device {
 
 	public void setGroupAddresses(List<GroupAddress> groupAddresses) {
 		this.groupAddresses = groupAddresses;
+	}
+
+	public String getNameAffix() {
+		return nameAffix;
+	}
+
+	public void setNameAffix(String nameAffix) {
+		this.nameAffix = nameAffix;
 	}
 }
