@@ -15,6 +15,7 @@
 		<springfox-swagger-ui.version>3.0.0</springfox-swagger-ui.version>
 		<dockerfile-maven-plugin.version>1.4.13</dockerfile-maven-plugin.version>
 		<docker.repository>tosate/knxdb</docker.repository>
+		<commons-csv.version>1.8</commons-csv.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -45,6 +46,13 @@
 			<artifactId>sqlite-dialect</artifactId>
 			<version>1.0</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-csv -->
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-csv</artifactId>
+		    <version>${commons-csv.version}</version>
+		</dependency>
+				
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

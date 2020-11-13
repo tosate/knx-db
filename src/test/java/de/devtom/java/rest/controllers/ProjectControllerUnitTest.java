@@ -18,7 +18,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import de.devtom.java.entities.Device;
+import de.devtom.java.entities.GroupAddress;
 import de.devtom.java.entities.Project;
+import de.devtom.java.entities.Room;
 import de.devtom.java.services.ProjectService;
 import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
 
@@ -129,6 +132,34 @@ public class ProjectControllerUnitTest extends AbstractControllerUnitTest {
 			assertEquals(outputJson, content);
 		} catch (JsonProcessingException e) {
 			fail(e.getMessage());
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testGetProjectAsCsv() {
+		Project project = new Project("project");
+		project.setProjectid(1l);
+		Room room = new Room("room", "Room Label");
+		room.setFloor("GF");
+		project.addRoom(room);
+		Device device1 = new Device("Device1 label", Device.TYPE_LIGHTBULB);
+		device1.setNameAffix("affix");
+		room.addDevice(device1);
+		device1.addAddress(new GroupAddress(1, 1, 1));
+		device1.addAddress(new GroupAddress(1, 4, 1));
+		Device device2 = new Device("Device2 label", Device.TYPE_LIGHTBULB);
+		room.addDevice(device2);
+		device2.addAddress(new GroupAddress(1, 1, 2));
+		device2.addAddress(new GroupAddress(1, 4, 2));
+		
+		try {
+			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(Optional.of(project));
+			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(URI + "/1?format=HomeAssistant").accept("text/comma-separated-values")).andReturn();
+			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
+			
+			validateHttpStatus(HttpStatus.OK, mvcResult);
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}

@@ -33,4 +33,8 @@ public class ProjectService {
 	public void delete(Project project) {
 		projectRepository.deleteById(project.getProjectid());
 	}
+	
+	public long getNumberOfEntities() {
+		return projectRepository.count();
+	}
 }

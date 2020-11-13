@@ -21,6 +21,14 @@ import io.swagger.annotations.ApiModelProperty;
 @Entity(name = "Device")
 @Table(name = "device")
 public class Device {
+	public static final String TYPE_LIGHTBULB = "Lightbulb";
+	public static final String TYPE_DIMMER = "Dimmer";
+	public static final String TYPE_CONTACT_SENSOR = "ContactSensor";
+	public static final String TYPE_JALOUSIE = "Jalousie";
+	public static final String TYPE_MOTION_SENSOR = "MotionSensor";
+	public static final String TYPE_POWER_OUTLET = "PowerOutlet";
+	public static final String TYPE_ROLLERSHUTTER = "Rollershutter";
+	public static final String TYPE_THERMOSTAT = "Thermostat";
 	@Id
 	@GeneratedValue(generator = "device_id_generator")
 	@TableGenerator(name = "device_id_generator", table="sqlite_sequence",
@@ -37,7 +45,7 @@ public class Device {
 	@NotNull
 	@ApiModelProperty(value = "Device type specifier")
 	private String deviceType;
-	@OneToMany(targetEntity = GroupAddress.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@OneToMany(targetEntity = GroupAddress.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
 	@JoinColumn(name = "groupaddressdevice", referencedColumnName = "deviceid")
 	private List<GroupAddress> groupAddresses;
 	

@@ -30,7 +30,7 @@ public class Project {
 	@NotNull
 	@ApiModelProperty(value = "Project name")
 	private String name;
-	@OneToMany(targetEntity = Room.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@OneToMany(targetEntity = Room.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
 	@JoinColumn(name = "roomproject", referencedColumnName = "projectid")
 	private List<Room> rooms;
 	protected Project() {

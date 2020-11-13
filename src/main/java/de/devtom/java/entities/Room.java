@@ -34,7 +34,7 @@ public class Room {
 	@ApiModelProperty(value = "Room label")
 	private String label;
 	private String floor;
-	@OneToMany(targetEntity = Device.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@OneToMany(targetEntity = Device.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
 	@JoinColumn(name = "deviceroom", referencedColumnName = "roomid")
 	private List<Device> devices;
 	

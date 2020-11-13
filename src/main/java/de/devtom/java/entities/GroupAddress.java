@@ -120,4 +120,9 @@ public class GroupAddress {
 	public void setGroupAddressId(Long groupAddressId) {
 		this.groupAddressId = groupAddressId;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("%d/%d/%d", this.mainGroup, this.middleGroup, this.subGroup);
+	}
 }

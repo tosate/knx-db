@@ -41,4 +41,8 @@ public class RoomService {
 		// explicitly delete the record in the database
 		roomRepository.deleteById(room.getRoomid());
 	}
+	
+	public long getNumberOfEntities() {
+		return roomRepository.count();
+	}
 }

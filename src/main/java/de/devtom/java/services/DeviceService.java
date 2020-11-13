@@ -36,4 +36,8 @@ public class DeviceService {
 		room.deleteDevice(device);
 		deviceRepository.deleteById(device.getDeviceid());
 	}
+	
+	public long getNumberOfEntities() {
+		return deviceRepository.count();
+	}
 }

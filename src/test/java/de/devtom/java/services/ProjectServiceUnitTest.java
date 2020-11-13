@@ -28,9 +28,9 @@ public class ProjectServiceUnitTest {
 		Project project = new Project(PROJECT_NAME);
 
 		// Create
-		int count = projectService.list().size();
-		project = projectService.save(project);;
-		assertEquals(count + 1, projectService.list().size());
+		long count = projectService.getNumberOfEntities();
+		project = projectService.save(project);
+		assertEquals(count + 1, projectService.getNumberOfEntities());
 		assertEquals(PROJECT_NAME, project.getName());
 		
 		// Update
@@ -41,6 +41,6 @@ public class ProjectServiceUnitTest {
 		
 		// Delete
 		projectService.delete(project);
-		assertEquals(count, projectService.list().size());
+		assertEquals(count, projectService.getNumberOfEntities());
 	}
 }

@@ -2,6 +2,7 @@ package de.devtom.java.rest.controllers;
 
 import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.devtom.java.entities.Project;
+import de.devtom.java.output.csv.HomeAssistantCsvGenerator;
 import de.devtom.java.services.ProjectService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -63,7 +65,7 @@ public class ProjectController {
 	@ApiOperation(value = "Get project instance by projectid")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Project instance found", response = Project.class),
-			@ApiResponse(code = 404, message = "Project insatnce no found")
+			@ApiResponse(code = 404, message = "Project instance no found")
 	})
 	@GetMapping(value = "/projects/{projectid}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Project> getProject(@PathVariable Long projectid) {
@@ -76,6 +78,35 @@ public class ProjectController {
 			response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 		
+		return response;
+	}
+	
+	@ApiOperation(value = "Get project instance data as CSV")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Project instance found", response = String.class),
+			@ApiResponse(code = 404, message = "Project instance not found")
+	})
+	@GetMapping(value = "/projects/{projectid}", produces = "text/comma-separated-values")
+	public ResponseEntity<String> getProjectAsCsv(@PathVariable Long projectid, @RequestParam String format) {
+		ResponseEntity<String> response = null;
+		try {
+			Optional<Project> project = projectService.findById(projectid);
+			if(project.isPresent()) {
+				String result = null;
+				if(format.equals("HomeAssistant")) {
+					result = HomeAssistantCsvGenerator.generateCsv(project.get());
+				} else {
+					result = String.format("Unsupported format [%s]", format);
+				}
+				response = new ResponseEntity<String>(result, HttpStatus.OK);
+			} else {
+				LOGGER.error("No project with ID [{}]", projectid);
+				response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		} catch (IOException e) {
+			LOGGER.error("CSV rendering failed: " + e.getMessage());
+			response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 		return response;
 	}
 	
