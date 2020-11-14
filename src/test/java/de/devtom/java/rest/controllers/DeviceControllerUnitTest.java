@@ -1,5 +1,11 @@
 package de.devtom.java.rest.controllers;
 
+import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import javax.persistence.EntityNotFoundException;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -16,12 +22,7 @@ import de.devtom.java.entities.Project;
 import de.devtom.java.entities.Room;
 import de.devtom.java.services.DeviceService;
 import de.devtom.java.services.ProjectService;
-
-import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
-
-import java.util.Optional;
+import de.devtom.java.services.RoomService;
 
 @ContextConfiguration(classes = {DeviceController.class})
 public class DeviceControllerUnitTest extends AbstractControllerUnitTest {
@@ -38,6 +39,8 @@ public class DeviceControllerUnitTest extends AbstractControllerUnitTest {
 	@MockBean
 	private ProjectService projectService;
 	@MockBean
+	private RoomService roomService;
+	@MockBean
 	private DeviceService deviceService;
 	
 	@Test
@@ -46,7 +49,7 @@ public class DeviceControllerUnitTest extends AbstractControllerUnitTest {
 		project.setProjectid(PROJECT_ID);
 		Room room = new Room(ROOM_NAME, ROOM_LABEL);
 		room.setRoomid(ROOM_ID);
-		project.addRoom(room);
+		room.setProject(project);
 		Device device = new Device(DEVICE_LABEL, DEVICE_TYPE);
 		device.setNameAffix(DEVICE_NAME_AFFIX);
 		Device savedDevice = new Device(DEVICE_LABEL, DEVICE_TYPE);
@@ -55,11 +58,13 @@ public class DeviceControllerUnitTest extends AbstractControllerUnitTest {
 		
 		try {
 			String inputJson = mapToJson(device);
-			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(Optional.of(project));
-			Mockito.when(deviceService.save(Mockito.any(Room.class), Mockito.any(Device.class))).thenReturn(savedDevice);
+			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(project);
+			Mockito.when(roomService.findById(Mockito.anyLong())).thenReturn(room);
+			Mockito.when(deviceService.createDevice(Mockito.any(Device.class))).thenReturn(savedDevice);
 			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(URI).contentType(MediaType.APPLICATION_JSON_VALUE).content(inputJson)).andReturn();
 			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
-			Mockito.verify(deviceService, Mockito.times(1)).save(Mockito.any(Room.class), Mockito.any(Device.class));
+			Mockito.verify(roomService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(deviceService, Mockito.times(1)).createDevice(Mockito.any(Device.class));
 			
 			validateHttpStatus(HttpStatus.CREATED, mvcResult);
 			String content = mvcResult.getResponse().getContentAsString();
@@ -78,7 +83,7 @@ public class DeviceControllerUnitTest extends AbstractControllerUnitTest {
 		project.setProjectid(PROJECT_ID);
 		Room room = new Room(ROOM_NAME, ROOM_LABEL);
 		room.setRoomid(ROOM_ID);
-		project.addRoom(room);
+		room.setProject(project);
 		Device device = new Device(DEVICE_LABEL, "");
 		
 		try {
@@ -99,15 +104,19 @@ public class DeviceControllerUnitTest extends AbstractControllerUnitTest {
 		project.setProjectid(PROJECT_ID);
 		Room room = new Room(ROOM_NAME, ROOM_LABEL);
 		room.setRoomid(ROOM_ID);
-		project.addRoom(room);
+		room.setProject(project);
 		Device device = new Device(DEVICE_LABEL, DEVICE_TYPE);
 		device.setDeviceid(DEVICE_ID);
-		room.addDevice(device);
+		device.setRoom(room);
 		
 		try {
-			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(Optional.of(project));
+			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(project);
+			Mockito.when(roomService.findById(Mockito.anyLong())).thenReturn(room);
+			Mockito.when(deviceService.findById(Mockito.anyLong())).thenReturn(device);
 			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(URI + "/" + DEVICE_ID)).andReturn();
 			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(roomService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(deviceService, Mockito.times(1)).findById(Mockito.anyLong());
 			
 			validateHttpStatus(HttpStatus.OK, mvcResult);
 			String content = mvcResult.getResponse().getContentAsString();
@@ -126,12 +135,16 @@ public class DeviceControllerUnitTest extends AbstractControllerUnitTest {
 		project.setProjectid(PROJECT_ID);
 		Room room = new Room(ROOM_NAME, ROOM_LABEL);
 		room.setRoomid(ROOM_ID);
-		project.addRoom(room);
+		room.setProject(project);
 		
 		try {
-			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(Optional.of(project));
+			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(project);
+			Mockito.when(roomService.findById(Mockito.anyLong())).thenReturn(room);
+			Mockito.when(deviceService.findById(Mockito.anyLong())).thenThrow(EntityNotFoundException.class);
 			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(URI + "/" + DEVICE_ID)).andReturn();
 			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(roomService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(deviceService, Mockito.times(1)).findById(Mockito.anyLong());
 			
 			validateHttpStatus(HttpStatus.NOT_FOUND, mvcResult);
 		} catch (JsonProcessingException e) {
@@ -147,20 +160,22 @@ public class DeviceControllerUnitTest extends AbstractControllerUnitTest {
 		project.setProjectid(PROJECT_ID);
 		Room room = new Room(ROOM_NAME, ROOM_LABEL);
 		room.setRoomid(ROOM_ID);
-		project.addRoom(room);
+		room.setProject(project);
 		Device device = new Device(DEVICE_LABEL, DEVICE_TYPE);
 		device.setDeviceid(DEVICE_ID);
-		room.addDevice(device);
+		device.setRoom(room);
 		Device updatedDevice = new Device("new-label", DEVICE_TYPE);
 		updatedDevice.setDeviceid(DEVICE_ID);
 		
 		try {
 			String inputJson = mapToJson(updatedDevice);
-			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(Optional.of(project));
-			Mockito.when(deviceService.update(Mockito.any(Device.class))).thenReturn(updatedDevice);
+			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(project);
+			Mockito.when(roomService.findById(Mockito.anyLong())).thenReturn(room);
+			Mockito.when(deviceService.updateDevice(Mockito.any(Device.class))).thenReturn(updatedDevice);
 			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(URI + "/" + DEVICE_ID).contentType(MediaType.APPLICATION_JSON_VALUE).content(inputJson)).andReturn();
 			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
-			Mockito.verify(deviceService, Mockito.times(1)).update(Mockito.any(Device.class));
+			Mockito.verify(roomService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(deviceService, Mockito.times(1)).updateDevice(Mockito.any(Device.class));
 			
 			validateHttpStatus(HttpStatus.OK, mvcResult);
 			String content = mvcResult.getResponse().getContentAsString();
@@ -179,16 +194,21 @@ public class DeviceControllerUnitTest extends AbstractControllerUnitTest {
 		project.setProjectid(PROJECT_ID);
 		Room room = new Room(ROOM_NAME, ROOM_LABEL);
 		room.setRoomid(ROOM_ID);
-		project.addRoom(room);
+		room.setProject(project);
 		Device device = new Device(DEVICE_LABEL, DEVICE_TYPE);
 		device.setDeviceid(DEVICE_ID);
-		room.addDevice(device);
+		device.setRoom(room);
 		
 		try {
-			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(Optional.of(project));
+			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(project);
+			Mockito.when(roomService.findById(Mockito.anyLong())).thenReturn(room);
+			Mockito.when(deviceService.findById(Mockito.anyLong())).thenReturn(device);
+			Mockito.when(deviceService.delete(Mockito.any(Device.class))).thenReturn(true);
 			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(URI + "/" + DEVICE_ID)).andReturn();
 			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
-			Mockito.verify(deviceService, Mockito.times(1)).delete(Mockito.any(Room.class), Mockito.any(Device.class));
+			Mockito.verify(roomService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(deviceService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(deviceService, Mockito.times(1)).delete(Mockito.any(Device.class));
 			
 			validateHttpStatus(HttpStatus.OK, mvcResult);
 			String content = mvcResult.getResponse().getContentAsString();

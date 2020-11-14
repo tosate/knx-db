@@ -4,7 +4,7 @@ import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.util.Optional;
+import javax.persistence.EntityNotFoundException;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -21,8 +21,10 @@ import de.devtom.java.entities.Device;
 import de.devtom.java.entities.GroupAddress;
 import de.devtom.java.entities.Project;
 import de.devtom.java.entities.Room;
+import de.devtom.java.services.DeviceService;
 import de.devtom.java.services.GroupAddressService;
 import de.devtom.java.services.ProjectService;
+import de.devtom.java.services.RoomService;
 
 @ContextConfiguration(classes = {GroupAddressController.class})
 public class GroupAddressControllerUnitTest extends AbstractControllerUnitTest {
@@ -42,6 +44,10 @@ public class GroupAddressControllerUnitTest extends AbstractControllerUnitTest {
 	@MockBean
 	private ProjectService projectService;
 	@MockBean
+	private RoomService roomService;
+	@MockBean
+	private DeviceService deviceService;
+	@MockBean
 	private GroupAddressService groupAddressService;
 	
 	@Test
@@ -50,21 +56,25 @@ public class GroupAddressControllerUnitTest extends AbstractControllerUnitTest {
 		project.setProjectid(PROJECT_ID);
 		Room room = new Room(ROOM_NAME, ROOM_LABEL);
 		room.setRoomid(ROOM_ID);
-		project.addRoom(room);
+		room.setProject(project);
 		Device device = new Device(DEVICE_LABEL, DEVICE_TYPE);
 		device.setDeviceid(DEVICE_ID);
-		room.addDevice(device);
+		device.setRoom(room);
 		GroupAddress address = new GroupAddress(ADDR_MAIN_GROUP, ADDR_MIDDLE_GROUP, ADDR_SUB_GROUP);
 		GroupAddress savedAddress = new GroupAddress(ADDR_MAIN_GROUP, ADDR_MIDDLE_GROUP, ADDR_SUB_GROUP);
 		savedAddress.setGroupAddressId(GROUP_ADDRESS_ID);
 		
 		try {
 			String inputJson = mapToJson(address);
-			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(Optional.of(project));
-			Mockito.when(groupAddressService.save(Mockito.any(Device.class), Mockito.any(GroupAddress.class))).thenReturn(savedAddress);
+			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(project);
+			Mockito.when(roomService.findById(Mockito.anyLong())).thenReturn(room);
+			Mockito.when(deviceService.findById(Mockito.anyLong())).thenReturn(device);
+			Mockito.when(groupAddressService.createGroupAddress(Mockito.any(GroupAddress.class))).thenReturn(savedAddress);
 			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(URI).contentType(MediaType.APPLICATION_JSON_VALUE).content(inputJson)).andReturn();
 			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
-			Mockito.verify(groupAddressService, Mockito.times(1)).save(Mockito.any(Device.class), Mockito.any(GroupAddress.class));
+			Mockito.verify(roomService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(deviceService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(groupAddressService, Mockito.times(1)).createGroupAddress(Mockito.any(GroupAddress.class));
 			
 			validateHttpStatus(HttpStatus.CREATED, mvcResult);
 			String content = mvcResult.getResponse().getContentAsString();
@@ -83,18 +93,24 @@ public class GroupAddressControllerUnitTest extends AbstractControllerUnitTest {
 		project.setProjectid(PROJECT_ID);
 		Room room = new Room(ROOM_NAME, ROOM_LABEL);
 		room.setRoomid(ROOM_ID);
-		project.addRoom(room);
+		room.setProject(project);
 		Device device = new Device(DEVICE_LABEL, DEVICE_TYPE);
 		device.setDeviceid(DEVICE_ID);
-		room.addDevice(device);
+		device.setRoom(room);
 		GroupAddress address = new GroupAddress(ADDR_MAIN_GROUP, ADDR_MIDDLE_GROUP, ADDR_SUB_GROUP);
 		address.setGroupAddressId(GROUP_ADDRESS_ID);
-		device.addAddress(address);
+		address.setDevice(device);
 		
 		try {
-			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(Optional.of(project));
+			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(project);
+			Mockito.when(roomService.findById(Mockito.anyLong())).thenReturn(room);
+			Mockito.when(deviceService.findById(Mockito.anyLong())).thenReturn(device);
+			Mockito.when(groupAddressService.findById(Mockito.anyLong())).thenReturn(address);
 			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(URI + "/" + GROUP_ADDRESS_ID)).andReturn();
 			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(roomService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(deviceService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(groupAddressService, Mockito.times(1)).findById(Mockito.anyLong());
 			
 			validateHttpStatus(HttpStatus.OK, mvcResult);
 			String content = mvcResult.getResponse().getContentAsString();
@@ -113,15 +129,21 @@ public class GroupAddressControllerUnitTest extends AbstractControllerUnitTest {
 		project.setProjectid(PROJECT_ID);
 		Room room = new Room(ROOM_NAME, ROOM_LABEL);
 		room.setRoomid(ROOM_ID);
-		project.addRoom(room);
+		room.setProject(project);
 		Device device = new Device(DEVICE_LABEL, DEVICE_TYPE);
 		device.setDeviceid(DEVICE_ID);
-		room.addDevice(device);
+		device.setRoom(room);
 		
 		try {
-			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(Optional.of(project));
+			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(project);
+			Mockito.when(roomService.findById(Mockito.anyLong())).thenReturn(room);
+			Mockito.when(deviceService.findById(Mockito.anyLong())).thenReturn(device);
+			Mockito.when(groupAddressService.findById(Mockito.anyLong())).thenThrow(EntityNotFoundException.class);
 			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(URI + "/" + GROUP_ADDRESS_ID)).andReturn();
 			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(roomService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(deviceService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(groupAddressService, Mockito.times(1)).findById(Mockito.anyLong());
 			
 			validateHttpStatus(HttpStatus.NOT_FOUND, mvcResult);
 		} catch (JsonProcessingException e) {
@@ -137,23 +159,27 @@ public class GroupAddressControllerUnitTest extends AbstractControllerUnitTest {
 		project.setProjectid(PROJECT_ID);
 		Room room = new Room(ROOM_NAME, ROOM_LABEL);
 		room.setRoomid(ROOM_ID);
-		project.addRoom(room);
+		room.setProject(project);
 		Device device = new Device(DEVICE_LABEL, DEVICE_TYPE);
 		device.setDeviceid(DEVICE_ID);
-		room.addDevice(device);
+		device.setRoom(room);
 		GroupAddress address = new GroupAddress(ADDR_MAIN_GROUP, ADDR_MIDDLE_GROUP, ADDR_SUB_GROUP);
 		address.setGroupAddressId(GROUP_ADDRESS_ID);
-		device.addAddress(address);
+		address.setDevice(device);
 		GroupAddress updatedGroupAddress = new GroupAddress(ADDR_MAIN_GROUP, ADDR_MIDDLE_GROUP, 2);
 		updatedGroupAddress.setGroupAddressId(GROUP_ADDRESS_ID);
 		
 		try {
 			String inputJson = mapToJson(updatedGroupAddress);
-			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(Optional.of(project));
-			Mockito.when(groupAddressService.update(Mockito.any(GroupAddress.class))).thenReturn(updatedGroupAddress);
+			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(project);
+			Mockito.when(roomService.findById(Mockito.anyLong())).thenReturn(room);
+			Mockito.when(deviceService.findById(Mockito.anyLong())).thenReturn(device);
+			Mockito.when(groupAddressService.updateGroupAddress(Mockito.any(GroupAddress.class))).thenReturn(updatedGroupAddress);
 			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(URI + "/" + GROUP_ADDRESS_ID).contentType(MediaType.APPLICATION_JSON_VALUE).content(inputJson)).andReturn();
 			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
-			Mockito.verify(groupAddressService, Mockito.times(1)).update(Mockito.any(GroupAddress.class));
+			Mockito.verify(roomService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(deviceService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(groupAddressService, Mockito.times(1)).updateGroupAddress(Mockito.any(GroupAddress.class));
 			
 			validateHttpStatus(HttpStatus.OK, mvcResult);
 			String content = mvcResult.getResponse().getContentAsString();
@@ -172,19 +198,26 @@ public class GroupAddressControllerUnitTest extends AbstractControllerUnitTest {
 		project.setProjectid(PROJECT_ID);
 		Room room = new Room(ROOM_NAME, ROOM_LABEL);
 		room.setRoomid(ROOM_ID);
-		project.addRoom(room);
+		room.setProject(project);
 		Device device = new Device(DEVICE_LABEL, DEVICE_TYPE);
 		device.setDeviceid(DEVICE_ID);
-		room.addDevice(device);
+		device.setRoom(room);
 		GroupAddress address = new GroupAddress(ADDR_MAIN_GROUP, ADDR_MIDDLE_GROUP, ADDR_SUB_GROUP);
 		address.setGroupAddressId(GROUP_ADDRESS_ID);
-		device.addAddress(address);
+		address.setDevice(device);
 		
 		try {
-			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(Optional.of(project));
+			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(project);
+			Mockito.when(roomService.findById(Mockito.anyLong())).thenReturn(room);
+			Mockito.when(deviceService.findById(Mockito.anyLong())).thenReturn(device);
+			Mockito.when(groupAddressService.findById(Mockito.anyLong())).thenReturn(address);
+			Mockito.when(groupAddressService.delete(Mockito.any(GroupAddress.class))).thenReturn(true);
 			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(URI + "/" + GROUP_ADDRESS_ID)).andReturn();
 			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
-			Mockito.verify(groupAddressService, Mockito.times(1)).delete(Mockito.any(Device.class), Mockito.any(GroupAddress.class));
+			Mockito.verify(roomService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(deviceService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(groupAddressService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(groupAddressService, Mockito.times(1)).delete(Mockito.any(GroupAddress.class));
 			
 			validateHttpStatus(HttpStatus.OK, mvcResult);
 			String content = mvcResult.getResponse().getContentAsString();

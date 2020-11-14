@@ -1,7 +1,8 @@
 package de.devtom.java.rest.controllers;
 
-import java.rmi.activation.UnknownObjectException;
-import java.util.Optional;
+import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
+
+import javax.persistence.EntityNotFoundException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +28,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
-
 @RestController
 @RequestMapping(BASE_PATH)
 public class RoomController {
@@ -42,23 +41,23 @@ public class RoomController {
 	@ApiOperation(value = "create a room instance")
 	@ApiResponses(value = {
 			@ApiResponse(code = 201, message = "New room instance created", response = Room.class),
-			@ApiResponse(code = 400, message = "Empty mandatory fields, room already exists or project not found")
+			@ApiResponse(code = 400, message = "Empty mandatory fields, room already exists or project not found"),
+			@ApiResponse(code = 404, message = "Entity not found")
 	})
 	@PostMapping(value = "/projects/{projectid}/rooms", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Room> createRoom(@PathVariable Long projectid, @RequestBody Room room) {
-		ResponseEntity<Room> response = null;
+	public ResponseEntity<?> createRoom(@PathVariable Long projectid, @RequestBody Room room) {
+		ResponseEntity<?> response = null;
 		try {
 			validateRoomFields(room);
-			Project project = getProject(projectid);
-			for(Room existinRoom : project.getRooms()) {
-				if(existinRoom.getName().equals(room.getName())) {
-					throw new IllegalArgumentException(String.format("Room with name [%s] already esxists.", room.getName()));
-				}
-			}
-			response = new ResponseEntity<Room>(roomService.save(project, room), HttpStatus.CREATED);
+			Project project = projectService.findById(projectid);
+			room.setProject(project);
+			response = new ResponseEntity<Room>(roomService.createRoom(room), HttpStatus.CREATED);
 		} catch (IllegalArgumentException e) {
 			LOGGER.error("Invalid input: {}", e.getMessage());
-			response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			response = new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		} catch (EntityNotFoundException e) {
+			LOGGER.error(e.getMessage());
+			response= new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 		
 		return response;
@@ -71,35 +70,20 @@ public class RoomController {
 			@ApiResponse(code = 404, message = "Room instance not found")
 	})
 	@GetMapping(value = "/projects/{projectid}/rooms/{roomid}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Room> getRoom(@PathVariable Long projectid, @PathVariable Long roomid) {
-		ResponseEntity<Room> response = null;
+	public ResponseEntity<?> getRoom(@PathVariable Long projectid, @PathVariable Long roomid) {
+		ResponseEntity<?> response = null;
 		try {
-			Project project = getProject(projectid);
-			response = new ResponseEntity<>(retrieveExistingRoom(project, roomid), HttpStatus.OK);
+			projectService.findById(projectid);
+			response = new ResponseEntity<Room>(roomService.findById(roomid), HttpStatus.OK);
 		} catch (IllegalArgumentException e) {
 			LOGGER.error("Invalid input: {}", e.getMessage());
-			response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		} catch (UnknownObjectException e) {
+			response = new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		} catch (EntityNotFoundException e) {
 			LOGGER.error(e.getMessage());
-			response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			response= new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 		
 		return response;
-	}
-	
-	private Room retrieveExistingRoom(Project project, Long roomid) throws UnknownObjectException {
-		Optional<Room> result = Optional.empty();
-		for(Room room : project.getRooms()) {
-			if(room.getRoomid() != null && room.getRoomid() == roomid) {
-				result = Optional.of(room);
-				break;
-			}
-		}
-		if(result.isPresent()) {
-			return result.get();
-		} else {
-			throw new UnknownObjectException(String.format("No room with roomid [%d]", roomid));
-		}
 	}
 
 	@ApiOperation(value = "Replace existing room instace")
@@ -109,20 +93,19 @@ public class RoomController {
 			@ApiResponse(code = 404, message = "Room instance to replace not found")
 	})
 	@PutMapping(value = "/projects/{projectid}/rooms/{roomid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Room> replaceExistingRoom(@PathVariable Long projectid, @PathVariable Long roomid, @RequestBody Room room) {
-		ResponseEntity<Room> response = null;
+	public ResponseEntity<?> replaceExistingRoom(@PathVariable Long projectid, @PathVariable Long roomid, @RequestBody Room room) {
+		ResponseEntity<?> response = null;
 		try {
 			validateRoomFields(room);
-			Project project = getProject(projectid);
-			Room existingRoom = retrieveExistingRoom(project, roomid);
-			room.setRoomid(existingRoom.getRoomid());
-			response = new ResponseEntity<>(roomService.replace(room), HttpStatus.OK);
+			Project project = projectService.findById(projectid);
+			room.setProject(project);
+			response = new ResponseEntity<Room>(roomService.updateRoom(room), HttpStatus.OK);
 		} catch (IllegalArgumentException e) {
 			LOGGER.error("Invalid input: {}", e.getMessage());
-			response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		} catch (UnknownObjectException e) {
+			response = new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+		} catch (EntityNotFoundException e) {
 			LOGGER.error(e.getMessage());
-			response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			response= new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 		
 		return response;
@@ -135,31 +118,22 @@ public class RoomController {
 			@ApiResponse(code = 404, message = "Room to delete not found")
 	})
 	@DeleteMapping(value = "/projects/{projectid}/rooms/{roomid}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Room> deleteRoom(@PathVariable Long projectid, @PathVariable Long roomid) {
-		ResponseEntity<Room> response = null;
+	public ResponseEntity<?> deleteRoom(@PathVariable Long projectid, @PathVariable Long roomid) {
+		ResponseEntity<?> response = null;
 		try {
-			Project project = getProject(projectid);
-			Room existingRoom = retrieveExistingRoom(project, roomid);
-			roomService.delete(project, existingRoom);
+			projectService.findById(projectid);
+			Room existingRoom = roomService.findById(roomid);
+			roomService.delete(existingRoom);
 			response = new ResponseEntity<>(existingRoom, HttpStatus.OK);
 		} catch (IllegalArgumentException e) {
 			LOGGER.error("Invalid input: {}", e.getMessage());
 			response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		} catch (UnknownObjectException e) {
+		} catch (EntityNotFoundException e) {
 			LOGGER.error(e.getMessage());
-			response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			response= new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 		
 		return response;
-	}
-	
-	private Project getProject(Long projectid) {
-		Optional<Project> project = projectService.findById(projectid);
-		if(project.isPresent()) {
-			return project.get();
-		} else {
-			throw new IllegalArgumentException(String.format("No project with projectid [%d]", projectid));
-		}
 	}
 
 	private void validateRoomFields(Room room) {

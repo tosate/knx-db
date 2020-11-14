@@ -1,19 +1,19 @@
 package de.devtom.java.entities;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 
 import io.swagger.annotations.ApiModelProperty;
@@ -45,9 +45,11 @@ public class Device {
 	@NotNull
 	@ApiModelProperty(value = "Device type specifier")
 	private String deviceType;
-	@OneToMany(targetEntity = GroupAddress.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-	@JoinColumn(name = "groupaddressdevice", referencedColumnName = "deviceid")
-	private List<GroupAddress> groupAddresses;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "deviceroom")
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	@JsonIgnore
+	private Room room;
 	
 	protected Device() {
 		
@@ -56,7 +58,6 @@ public class Device {
 	public Device(String label, String deviceType) {
 		this.label = label;
 		this.deviceType = deviceType;
-		this.groupAddresses = new ArrayList<>();
 	}
 
 	public String getLabel() {
@@ -65,10 +66,6 @@ public class Device {
 
 	public void setLabel(String label) {
 		this.label = label;
-	}
-
-	public List<GroupAddress> getGroupAddresses() {
-		return groupAddresses;
 	}
 
 	public Long getDeviceid() {
@@ -87,23 +84,19 @@ public class Device {
 		this.deviceType = deviceType;
 	}
 
-	public void addAddress(GroupAddress address) {
-		this.groupAddresses.add(address);
-	}
-	
-	public void deleteAddress(GroupAddress address) {
-		this.groupAddresses.remove(address);
-	}
-
-	public void setGroupAddresses(List<GroupAddress> groupAddresses) {
-		this.groupAddresses = groupAddresses;
-	}
-
 	public String getNameAffix() {
 		return nameAffix;
 	}
 
 	public void setNameAffix(String nameAffix) {
 		this.nameAffix = nameAffix;
+	}
+
+	public Room getRoom() {
+		return room;
+	}
+
+	public void setRoom(Room room) {
+		this.room = room;
 	}
 }

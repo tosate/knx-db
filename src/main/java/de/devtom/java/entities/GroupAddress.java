@@ -2,11 +2,18 @@ package de.devtom.java.entities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 
 import de.devtom.java.utils.ServiceUtils;
@@ -39,6 +46,11 @@ public class GroupAddress {
 	private String dataType;
 	@ApiModelProperty(value = "Function description of this address")
 	private String function;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "groupaddressdevice")
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	@JsonIgnore
+	private Device device;
 	
 	protected GroupAddress() {
 		
@@ -124,5 +136,25 @@ public class GroupAddress {
 	@Override
 	public String toString() {
 		return String.format("%d/%d/%d", this.mainGroup, this.middleGroup, this.subGroup);
+	}
+
+	public Device getDevice() {
+		return device;
+	}
+
+	public void setDevice(Device device) {
+		this.device = device;
+	}
+
+	public void setMainGroup(int mainGroup) {
+		this.mainGroup = mainGroup;
+	}
+
+	public void setMiddleGroup(int middleGroup) {
+		this.middleGroup = middleGroup;
+	}
+
+	public void setSubGroup(int subGroup) {
+		this.subGroup = subGroup;
 	}
 }

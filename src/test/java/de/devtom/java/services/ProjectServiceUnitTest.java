@@ -29,14 +29,14 @@ public class ProjectServiceUnitTest {
 
 		// Create
 		long count = projectService.getNumberOfEntities();
-		project = projectService.save(project);
+		project = projectService.createProject(project);
 		assertEquals(count + 1, projectService.getNumberOfEntities());
 		assertEquals(PROJECT_NAME, project.getName());
 		
 		// Update
 		String alteredProjectName = "alteredName";
 		project.setName(alteredProjectName);
-		project = projectService.save(project);
+		project = projectService.createProject(project);
 		assertEquals(alteredProjectName, project.getName());
 		
 		// Delete

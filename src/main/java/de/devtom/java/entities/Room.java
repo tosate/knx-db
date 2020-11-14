@@ -1,18 +1,18 @@
 package de.devtom.java.entities;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 
 import de.devtom.java.utils.ServiceUtils;
@@ -34,9 +34,11 @@ public class Room {
 	@ApiModelProperty(value = "Room label")
 	private String label;
 	private String floor;
-	@OneToMany(targetEntity = Device.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-	@JoinColumn(name = "deviceroom", referencedColumnName = "roomid")
-	private List<Device> devices;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "roomproject", nullable = false)
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	@JsonIgnore
+	private Project project;
 	
 	protected Room() {
 		
@@ -45,7 +47,6 @@ public class Room {
 	public Room(String name, String label) {
 		this.name = name;
 		this.label = label;
-		this.devices = new ArrayList<>();
 	}
 
 	public String getName() {
@@ -71,10 +72,6 @@ public class Room {
 	public void setFloor(String floor) {
 		this.floor = floor;
 	}
-	
-	public void addDevice(Device device) {
-		this.devices.add(device);
-	}
 
 	public Long getRoomid() {
 		return roomid;
@@ -82,18 +79,6 @@ public class Room {
 
 	public void setRoomid(Long roomid) {
 		this.roomid = roomid;
-	}
-
-	public void deleteDevice(Device device) {
-		this.devices.remove(device);
-	}
-
-	public List<Device> getDevices() {
-		return devices;
-	}
-
-	public void setDevices(List<Device> devices) {
-		this.devices = devices;
 	}
 
 	@Override
@@ -125,5 +110,13 @@ public class Room {
         }
         
         return true;
+	}
+
+	public Project getProject() {
+		return project;
+	}
+
+	public void setProject(Project project) {
+		this.project = project;
 	}
 }

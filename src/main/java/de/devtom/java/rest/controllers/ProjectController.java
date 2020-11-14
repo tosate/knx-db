@@ -5,7 +5,8 @@ import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
+import javax.persistence.EntityNotFoundException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +25,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import de.devtom.java.entities.Device;
+import de.devtom.java.entities.GroupAddress;
 import de.devtom.java.entities.Project;
+import de.devtom.java.entities.Room;
 import de.devtom.java.output.csv.HomeAssistantCsvGenerator;
+import de.devtom.java.services.DeviceService;
+import de.devtom.java.services.GroupAddressService;
 import de.devtom.java.services.ProjectService;
+import de.devtom.java.services.RoomService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -37,6 +44,12 @@ public class ProjectController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProjectController.class);
 	@Autowired
 	private ProjectService projectService;
+	@Autowired
+	private RoomService roomService;
+	@Autowired
+	private DeviceService deviceService;
+	@Autowired
+	private GroupAddressService groupAddressService;
 	
 	@ApiOperation(value = "create a project instance")
 	@ApiResponses(value = {
@@ -48,12 +61,7 @@ public class ProjectController {
 		ResponseEntity<Project> response = null;
 		try {
 			validateProjectName(project);
-			Optional<Project> existingProject = projectService.findByName(project.getName());
-			if(existingProject.isPresent()) {
-				throw new IllegalArgumentException(String.format("Project with name [%s] already exists!", project.getName()));
-			} else {
-				response = new ResponseEntity<>(projectService.save(project), HttpStatus.CREATED);
-			}
+			response = new ResponseEntity<>(projectService.createProject(project), HttpStatus.CREATED);
 		} catch (IllegalArgumentException e) {
 			LOGGER.error("Invalid input: {}", e.getMessage());
 			response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -68,14 +76,14 @@ public class ProjectController {
 			@ApiResponse(code = 404, message = "Project instance no found")
 	})
 	@GetMapping(value = "/projects/{projectid}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Project> getProject(@PathVariable Long projectid) {
-		ResponseEntity<Project> response = null;
-		Optional<Project> project = projectService.findById(projectid);
-		if(project.isPresent()) {
-			response = new ResponseEntity<>(project.get(), HttpStatus.OK);
-		} else {
-			LOGGER.error("No project with ID [{}]", projectid);
-			response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	public ResponseEntity<?> getProject(@PathVariable Long projectid) {
+		ResponseEntity<?> response = null;
+		try {
+			Project project = projectService.findById(projectid);
+			response = new ResponseEntity<Project>(project, HttpStatus.OK);
+		} catch(EntityNotFoundException e) {
+			LOGGER.error(e.getMessage());
+			response = new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 		
 		return response;
@@ -90,22 +98,29 @@ public class ProjectController {
 	public ResponseEntity<String> getProjectAsCsv(@PathVariable Long projectid, @RequestParam String format) {
 		ResponseEntity<String> response = null;
 		try {
-			Optional<Project> project = projectService.findById(projectid);
-			if(project.isPresent()) {
-				String result = null;
-				if(format.equals("HomeAssistant")) {
-					result = HomeAssistantCsvGenerator.generateCsv(project.get());
-				} else {
-					result = String.format("Unsupported format [%s]", format);
+			Project project = projectService.findById(projectid);
+			String result = null;
+			if(format.equals("HomeAssistant")) {
+				List<Room> rooms = roomService.findByProjectId(projectid);
+				List<Device> devices = new ArrayList<>();
+				for(Room room : rooms) {
+					devices.addAll(deviceService.findByRoomId(room.getRoomid()));
 				}
-				response = new ResponseEntity<String>(result, HttpStatus.OK);
+				List<GroupAddress> groupAddresses = new ArrayList<>();
+				for(Device device : devices) {
+					groupAddresses.addAll(groupAddressService.findByDeviceId(device.getDeviceid()));
+				}
+				result = HomeAssistantCsvGenerator.generateCsv(project, rooms, devices, groupAddresses);
 			} else {
-				LOGGER.error("No project with ID [{}]", projectid);
-				response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+				result = String.format("Unsupported format [%s]", format);
 			}
+			response = new ResponseEntity<String>(result, HttpStatus.OK);
 		} catch (IOException e) {
 			LOGGER.error("CSV rendering failed: " + e.getMessage());
-			response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			response = new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch(EntityNotFoundException e) {
+			LOGGER.error(e.getMessage());
+			response = new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 		return response;
 	}
@@ -137,20 +152,18 @@ public class ProjectController {
 		@ApiResponse(code = 404, message = "Project instance to replace not found")
 	})
 	@PutMapping(value = "/projects/{projectid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Project> replaceExistingProject(@PathVariable Long projectid, @RequestBody Project project) {
-		ResponseEntity<Project> response = null;
+	public ResponseEntity<?> replaceExistingProject(@PathVariable Long projectid, @RequestBody Project project) {
+		ResponseEntity<?> response = null;
 		try {
 			validateProjectName(project);
-			Optional<Project> existingProject = projectService.findById(projectid);
-			if(existingProject.isPresent()) {
-				existingProject.get().setName(project.getName());
-				response = new ResponseEntity<>(projectService.save(existingProject.get()), HttpStatus.OK);
-			} else {
-				response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
-			}
+			Project existingProject = projectService.findById(projectid);
+			response = new ResponseEntity<Project>(projectService.createProject(existingProject), HttpStatus.OK);
 		} catch (IllegalArgumentException e) {
 			LOGGER.error("Invalid input: " + e.getMessage());
-			response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			response = new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		} catch(EntityNotFoundException e) {
+			LOGGER.error(e.getMessage());
+			response = new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 		
 		return response;
@@ -162,14 +175,15 @@ public class ProjectController {
 			@ApiResponse(code = 404, message = "Project to delete not found")
 	})
 	@DeleteMapping(value = "/projects/{projectid}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Project> deleteProject(@PathVariable Long projectid) {
-		ResponseEntity<Project> response = null;
-		Optional<Project> existingProject = projectService.findById(projectid);
-		if(existingProject.isPresent()) {
-			projectService.delete(existingProject.get());
-			response = new ResponseEntity<Project>(existingProject.get(), HttpStatus.OK);
-		} else {
-			response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	public ResponseEntity<?> deleteProject(@PathVariable Long projectid) {
+		ResponseEntity<?> response = null;
+		try {
+			Project existingProject = projectService.findById(projectid);
+			projectService.delete(existingProject);
+			response = new ResponseEntity<Project>(existingProject, HttpStatus.OK);
+		}  catch(EntityNotFoundException e) {
+			LOGGER.error(e.getMessage());
+			response = new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 		
 		return response;

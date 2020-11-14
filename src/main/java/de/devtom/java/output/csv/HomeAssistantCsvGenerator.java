@@ -19,19 +19,27 @@ import de.devtom.java.entities.Room;
 public class HomeAssistantCsvGenerator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(HomeAssistantCsvGenerator.class);
 	
-	public static String generateCsv(Project project) throws IOException {
+	public static String generateCsv(Project project, List<Room> rooms, List<Device> devices, List<GroupAddress> groupAddresses) throws IOException {
 		StringWriter out = new StringWriter();
 		try (CSVPrinter printer = new CSVPrinter(out, CSVFormat.DEFAULT.withHeader(getHeaders()))) {
-			for(Room room : project.getRooms()) {
-				for(Device device : room.getDevices()) {
-					printer.printRecord(deviceToValue(room, device));
+			for(Room room : rooms) {
+				for(Device device : devices) {
+					if(device.getRoom().getRoomid().equals(room.getRoomid())) {
+						List<GroupAddress> deviceGroupAddresses = new ArrayList<>();
+						for(GroupAddress g : groupAddresses) {
+							if(g.getDevice().getDeviceid().equals(device.getDeviceid())) {
+								deviceGroupAddresses.add(g);
+							}
+						}
+						printer.printRecord(deviceToValue(room, device, deviceGroupAddresses));
+					}
 				}
 			}
 		}
 		return out.toString();
 	}
 	
-	private static List<String> deviceToValue(Room room, Device device) {
+	private static List<String> deviceToValue(Room room, Device device, List<GroupAddress> deviceGroupAddresses) {
 		List<String> row = new ArrayList<>();
 		row.add(getDeviceName(room, device));
 		row.add(device.getLabel());
@@ -39,37 +47,37 @@ public class HomeAssistantCsvGenerator {
 		row.add(getRoomName(room));
 		row.add(room.getLabel());
 		row.add(device.getDeviceType());
-		addGroupAddresses(row, device);
+		addGroupAddresses(row, device, deviceGroupAddresses);
 		
 		return row;
 	}
 	
-	private static void addGroupAddresses(List<String> row, Device device) {
+	private static void addGroupAddresses(List<String> row, Device device, List<GroupAddress> deviceGroupAddresses) {
 		switch(device.getDeviceType()) {
 		case Device.TYPE_LIGHTBULB:
-			generateGroupAddressColumns(row, device.getGroupAddresses(), 1, 4, null, null, null, null);
+			generateGroupAddressColumns(row, deviceGroupAddresses, 1, 4, null, null, null, null);
 			break;
 		case Device.TYPE_DIMMER:
-			generateGroupAddressColumns(row, device.getGroupAddresses(), 1, 4, 2, 3, 5, null);
+			generateGroupAddressColumns(row, deviceGroupAddresses, 1, 4, 2, 3, 5, null);
 			row.add("");
 			break;
 		case Device.TYPE_CONTACT_SENSOR:
-			generateGroupAddressColumns(row, device.getGroupAddresses(), 5, null, null, null, null, null);
+			generateGroupAddressColumns(row, deviceGroupAddresses, 5, null, null, null, null, null);
 			break;
 		case Device.TYPE_JALOUSIE:
-			generateGroupAddressColumns(row, device.getGroupAddresses(), 1, 2, 4, 3, 6, 5);
+			generateGroupAddressColumns(row, deviceGroupAddresses, 1, 2, 4, 3, 6, 5);
 			break;
 		case Device.TYPE_MOTION_SENSOR:
-			generateGroupAddressColumns(row, device.getGroupAddresses(), 5, null, null, null, null, null);
+			generateGroupAddressColumns(row, deviceGroupAddresses, 5, null, null, null, null, null);
 			break;
 		case Device.TYPE_POWER_OUTLET:
-			generateGroupAddressColumns(row, device.getGroupAddresses(), 1, 4, null, null, null, null);
+			generateGroupAddressColumns(row, deviceGroupAddresses, 1, 4, null, null, null, null);
 			break;
 		case Device.TYPE_ROLLERSHUTTER:
-			generateGroupAddressColumns(row, device.getGroupAddresses(), 1, 2, 4, 3, null, null);
+			generateGroupAddressColumns(row, deviceGroupAddresses, 1, 2, 4, 3, null, null);
 			break;
 		case Device.TYPE_THERMOSTAT:
-			generateGroupAddressColumns(row, device.getGroupAddresses(), 1, 2, 6, 4, 7, null);
+			generateGroupAddressColumns(row, deviceGroupAddresses, 1, 2, 6, 4, 7, null);
 			break;
 		default:
 			LOGGER.warn("Unknown device type [{}].", device.getDeviceType());

@@ -1,5 +1,9 @@
 package de.devtom.java.rest.controllers;
 
+import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
+
+import javax.persistence.EntityNotFoundException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,18 +21,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.devtom.java.entities.Device;
-import de.devtom.java.entities.Project;
 import de.devtom.java.entities.Room;
 import de.devtom.java.services.DeviceService;
 import de.devtom.java.services.ProjectService;
+import de.devtom.java.services.RoomService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-
-import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
-
-import java.rmi.activation.UnknownObjectException;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(BASE_PATH)
@@ -38,29 +37,31 @@ public class DeviceController {
 	@Autowired
 	private DeviceService deviceService;
 	@Autowired
+	private RoomService roomService;
+	@Autowired
 	private ProjectService projectService;
 	
 	@ApiOperation(value = "create device instance")
 	@ApiResponses(value = {
 			@ApiResponse(code = 201, message = "New device instance created", response = Device.class),
-			@ApiResponse(code = 400, message = "Empty mandatory fields, device alredy exists or parent elements not found")
+			@ApiResponse(code = 400, message = "Empty mandatory fields, device alredy exists or parent elements not found"),
+			@ApiResponse(code = 404, message = "Entity not found")
 	})
 	@PostMapping(value = "/projects/{projectid}/rooms/{roomid}/devices", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Device> createDevice(@PathVariable Long projectid, @PathVariable Long roomid, @RequestBody Device device) {
-		ResponseEntity<Device> response = null;
+	public ResponseEntity<?> createDevice(@PathVariable Long projectid, @PathVariable Long roomid, @RequestBody Device device) {
+		ResponseEntity<?> response = null;
 		try {
 			validateDeviceFields(device);
-			Project project = getProject(projectid);
-			Room room = getRoom(project, roomid);
-			for(Device existingDevice : room.getDevices()) {
-				if(existingDevice.getLabel().equals(device.getLabel())) {
-					throw new IllegalArgumentException(String.format("Device with label [%s] already exists.", device.getLabel()));
-				}
-			}
-			response = new ResponseEntity<>(deviceService.save(room, device), HttpStatus.CREATED);
+			projectService.findById(projectid);
+			Room room = roomService.findById(roomid);
+			device.setRoom(room);
+			response = new ResponseEntity<Device>(deviceService.createDevice(device), HttpStatus.CREATED);
 		} catch (IllegalArgumentException e) {
 			LOGGER.error("Invalid input: {}", e.getMessage());
-			response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			response = new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		} catch (EntityNotFoundException e) {
+			LOGGER.error(e.getMessage());
+			response= new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 		
 		return response;
@@ -73,18 +74,18 @@ public class DeviceController {
 			@ApiResponse(code = 404, message = "Device instance not found")
 	})
 	@GetMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Device> getDevice(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid) {
-		ResponseEntity<Device> response = null;
+	public ResponseEntity<?> getDevice(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid) {
+		ResponseEntity<?> response = null;
 		try {
-			Project project = getProject(projectid);
-			Room room = getRoom(project, roomid);
-			response = new ResponseEntity<>(retrieveExistingDevice(room, deviceid), HttpStatus.OK);
+			projectService.findById(projectid);
+			roomService.findById(roomid);
+			response = new ResponseEntity<>(deviceService.findById(deviceid), HttpStatus.OK);
 		} catch (IllegalArgumentException e) {
 			LOGGER.error("Invalid input: {}", e.getMessage());
-			response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		} catch (UnknownObjectException e) {
+			response = new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		} catch (EntityNotFoundException e) {
 			LOGGER.error(e.getMessage());
-			response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			response= new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 		
 		return response;
@@ -97,21 +98,20 @@ public class DeviceController {
 			@ApiResponse(code = 404, message = "Device instance to replace not found") 
 	})
 	@PutMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Device> replaceExistingDevice(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid, @RequestBody Device device) {
-		ResponseEntity<Device> response = null;
+	public ResponseEntity<?> replaceExistingDevice(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid, @RequestBody Device device) {
+		ResponseEntity<?> response = null;
 		try {
 			validateDeviceFields(device);
-			Project project = getProject(projectid);
-			Room room = getRoom(project, roomid);
-			Device existingDevice = retrieveExistingDevice(room, deviceid);
-			device.setDeviceid(existingDevice.getDeviceid());
-			response = new ResponseEntity<>(deviceService.update(device), HttpStatus.OK);
+			projectService.findById(projectid);
+			Room room = roomService.findById(roomid);
+			device.setRoom(room);
+			response = new ResponseEntity<Device>(deviceService.updateDevice(device), HttpStatus.OK);
 		} catch (IllegalArgumentException e) {
 			LOGGER.error("Invalid input: {}", e.getMessage());
-			response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		} catch (UnknownObjectException e) {
+			response = new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		} catch (EntityNotFoundException e) {
 			LOGGER.error(e.getMessage());
-			response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			response= new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 		
 		return response;
@@ -124,57 +124,23 @@ public class DeviceController {
 			@ApiResponse(code = 404, message = "Device to delete not found")
 	})
 	@DeleteMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Device> deleteDevice(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid) {
-		ResponseEntity<Device> response = null;
+	public ResponseEntity<?> deleteDevice(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid) {
+		ResponseEntity<?> response = null;
 		try {
-			Project project = getProject(projectid);
-			Room room = getRoom(project, roomid);
-			Device existingDevice = retrieveExistingDevice(room, deviceid);
-			deviceService.delete(room, existingDevice);
-			response = new ResponseEntity<>(existingDevice, HttpStatus.OK);
+			projectService.findById(projectid);
+			roomService.findById(roomid);
+			Device existingDevice = deviceService.findById(deviceid);
+			deviceService.delete(existingDevice);
+			response = new ResponseEntity<Device>(existingDevice, HttpStatus.OK);
 		} catch (IllegalArgumentException e) {
 			LOGGER.error("Invalid input: {}", e.getMessage());
-			response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		} catch (UnknownObjectException e) {
+			response = new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		} catch (EntityNotFoundException e) {
 			LOGGER.error(e.getMessage());
-			response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			response= new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 		
 		return response;
-	}
-	
-	private Device retrieveExistingDevice(Room room, Long deviceid) throws UnknownObjectException {
-		Optional<Device> result = Optional.empty();
-		for(Device device : room.getDevices()) {
-			if(device.getDeviceid() != null && device.getDeviceid() == deviceid) {
-				result = Optional.of(device);
-				break;
-			}
-		}
-		if(result.isPresent()) {
-			return result.get();
-		} else {
-			throw new UnknownObjectException(String.format("No device with deviceid [%d]", deviceid));
-		}
-	}
-
-	private Room getRoom(Project project, Long roomid) {
-		for(Room room : project.getRooms()) {
-			if(room.getRoomid().equals(roomid)) {
-				return room;
-			}
-		}
-		
-		throw new IllegalArgumentException(String.format("Project [%s] contains no room with room ID [%d]", project.getName(), roomid));
-	}
-
-	private Project getProject(Long projectid) {
-		Optional<Project> project = projectService.findById(projectid);
-		if(project.isPresent()) {
-			return project.get();
-		} else {
-			throw new IllegalArgumentException(String.format("No project with projectid [%d]", projectid));
-		}
 	}
 
 	private void validateDeviceFields(Device device) {
