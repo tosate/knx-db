@@ -2,6 +2,8 @@ package de.devtom.java.rest.controllers;
 
 import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
 
+import java.util.List;
+
 import javax.persistence.EntityNotFoundException;
 
 import org.slf4j.Logger;
@@ -85,6 +87,27 @@ public class GroupAddressController {
 		} catch (IllegalArgumentException e) {
 			LOGGER.error("Invalid input: {}", e.getMessage());
 			response = new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		} catch (EntityNotFoundException e) {
+			LOGGER.error(e.getMessage());
+			response= new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
+		
+		return response;
+	}
+	
+	@ApiOperation(value = "get group address list")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Group address list for device", response = List.class),
+			@ApiResponse(code = 404, message = "Entity not fould")
+	})
+	@GetMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}/group-addresses", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getGroupAddressList(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid) {
+		ResponseEntity<?> response = null;
+		try {
+			projectService.findById(projectid);
+			roomService.findById(roomid);
+			deviceService.findById(deviceid);
+			response = new ResponseEntity<List<GroupAddress>>(groupAddressService.findByDeviceId(deviceid), HttpStatus.OK);
 		} catch (EntityNotFoundException e) {
 			LOGGER.error(e.getMessage());
 			response= new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);

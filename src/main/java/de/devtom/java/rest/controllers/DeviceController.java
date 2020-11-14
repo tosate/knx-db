@@ -2,6 +2,8 @@ package de.devtom.java.rest.controllers;
 
 import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
 
+import java.util.List;
+
 import javax.persistence.EntityNotFoundException;
 
 import org.slf4j.Logger;
@@ -83,6 +85,26 @@ public class DeviceController {
 		} catch (IllegalArgumentException e) {
 			LOGGER.error("Invalid input: {}", e.getMessage());
 			response = new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		} catch (EntityNotFoundException e) {
+			LOGGER.error(e.getMessage());
+			response= new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
+		
+		return response;
+	}
+	
+	@ApiOperation(value = "get device list")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Device list for room", response = List.class),
+			@ApiResponse(code = 404, message = "Entity not found")
+	})
+	@GetMapping(value = "/projects/{projectid}/rooms/{roomid}/devices", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getDeviceList(@PathVariable Long projectid, @PathVariable Long roomid) {
+		ResponseEntity<?> response = null;
+		try {
+			projectService.findById(projectid);
+			roomService.findById(roomid);
+			response = new ResponseEntity<List<Device>>(deviceService.findByRoomId(roomid), HttpStatus.OK);
 		} catch (EntityNotFoundException e) {
 			LOGGER.error(e.getMessage());
 			response= new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
