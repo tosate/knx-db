@@ -1,6 +1,5 @@
 package de.devtom.java.config;
 
-import static java.util.Collections.singletonList;
 import static springfox.documentation.schema.AlternateTypeRules.newRule;
 
 import java.time.LocalDate;
@@ -17,11 +16,9 @@ import com.fasterxml.classmate.TypeResolver;
 
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.schema.ScalarType;
 import springfox.documentation.schema.WildcardType;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
-import springfox.documentation.service.ParameterType;
 import springfox.documentation.service.VendorExtension;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
@@ -55,11 +52,7 @@ public class KnxDbApplicationConfiguration {
 								typeResolver.resolve(ResponseEntity.class, WildcardType.class)),
 						typeResolver.resolve(WildcardType.class)))
 				.useDefaultResponseMessages(false)
-				.enableUrlTemplating(true)
-				.globalRequestParameters(singletonList(
-						new springfox.documentation.builders.RequestParameterBuilder().name("someGlobalParameter")
-								.description("Description of someGlobalParameter").in(ParameterType.QUERY)
-								.required(true).query(q -> q.model(m -> m.scalarModel(ScalarType.STRING))).build()));
+				.enableUrlTemplating(true);
 	}
 
 	private ApiInfo apiInfo() {

@@ -29,6 +29,7 @@ public class Device {
 	public static final String TYPE_POWER_OUTLET = "PowerOutlet";
 	public static final String TYPE_ROLLERSHUTTER = "Rollershutter";
 	public static final String TYPE_THERMOSTAT = "Thermostat";
+	public static final String TYPE_SMOKE_SENSOR = "SmokeSensor";
 	@Id
 	@GeneratedValue(generator = "device_id_generator")
 	@TableGenerator(name = "device_id_generator", table="sqlite_sequence",

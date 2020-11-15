@@ -79,6 +79,9 @@ public class HomeAssistantCsvGenerator {
 		case Device.TYPE_THERMOSTAT:
 			generateGroupAddressColumns(row, deviceGroupAddresses, 1, 2, 6, 4, 7, null);
 			break;
+		case Device.TYPE_SMOKE_SENSOR:
+			generateGroupAddressColumns(row, deviceGroupAddresses, 1, null, null, null, null, null);
+			break;
 		default:
 			LOGGER.warn("Unknown device type [{}].", device.getDeviceType());
 		}
