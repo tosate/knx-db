@@ -4,6 +4,9 @@ import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -151,6 +154,37 @@ public class RoomControllerUnitTest extends AbstractControllerUnitTest {
 			validateHttpStatus(HttpStatus.OK, mvcResult);
 			String content = mvcResult.getResponse().getContentAsString();
 			String outputJson = mapToJson(roomToDelete);
+			assertEquals(outputJson, content);
+		} catch (JsonProcessingException e) {
+			fail(e.getMessage());
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testGetRoomList() {
+		Project project = new Project(PROJECT_NAME);
+		project.setProjectid(PROJECT_ID);
+		List<Room> roomList = new ArrayList<>();
+		Room room1 = new Room(ROOM_NAME, ROOM_LABEL);
+		room1.setRoomid(ROOM_ID);
+		room1.setProject(project);
+		roomList.add(room1);
+		Room room2 = new Room("name2", "label2");
+		room2.setProject(project);
+		room2.setRoomid(2l);
+		roomList.add(room2);
+		try {
+			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(project);
+			Mockito.when(roomService.findByProjectId(Mockito.anyLong())).thenReturn(roomList);
+			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(URI)).andReturn();
+			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(roomService, Mockito.times(1)).findByProjectId(Mockito.anyLong());
+			
+			validateHttpStatus(HttpStatus.OK, mvcResult);
+			String content = mvcResult.getResponse().getContentAsString();
+			String outputJson = mapToJson(roomList);
 			assertEquals(outputJson, content);
 		} catch (JsonProcessingException e) {
 			fail(e.getMessage());

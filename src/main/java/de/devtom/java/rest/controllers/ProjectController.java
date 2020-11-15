@@ -11,6 +11,7 @@ import javax.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +43,8 @@ import io.swagger.annotations.ApiResponses;
 @RequestMapping(BASE_PATH)
 public class ProjectController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProjectController.class);
+	public static final String MEDIA_TYPE_CSV_STRING = "text/csv";
+	private static final MediaType MEDIA_TYPE_CSV = new MediaType("text", "csv");
 	@Autowired
 	private ProjectService projectService;
 	@Autowired
@@ -70,59 +73,53 @@ public class ProjectController {
 		return response;
 	}
 	
-	@ApiOperation(value = "Get project instance by projectid")
+	@ApiOperation(value = "Get project instance by projectid. Provide the format parameter for CSV output")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Project instance found", response = Project.class),
 			@ApiResponse(code = 404, message = "Project instance no found")
 	})
-	@GetMapping(value = "/projects/{projectid}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getProject(@PathVariable Long projectid) {
+	@GetMapping(value = "/projects/{projectid}", produces = {MediaType.APPLICATION_JSON_VALUE,MEDIA_TYPE_CSV_STRING})
+	public ResponseEntity<?> getProject(@PathVariable Long projectid, @RequestParam(required = false) String format) {
 		ResponseEntity<?> response = null;
 		try {
 			Project project = projectService.findById(projectid);
-			response = new ResponseEntity<Project>(project, HttpStatus.OK);
+			if(!StringUtils.isEmpty(format)) {
+				final HttpHeaders httpHeaders = new HttpHeaders();
+				httpHeaders.setContentType(MEDIA_TYPE_CSV);
+				response = new ResponseEntity<String>(generateCsv(project, format), httpHeaders, HttpStatus.OK);
+			} else {
+				final HttpHeaders httpHeaders = new HttpHeaders();
+				httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+				response = new ResponseEntity<Project>(project, httpHeaders, HttpStatus.OK);
+			}
 		} catch(EntityNotFoundException e) {
 			LOGGER.error(e.getMessage());
 			response = new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
+		} catch (IOException e) {
+			LOGGER.error("CSV rendering failed: " + e.getMessage());
+			response = new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		return response;
 	}
 	
-	@ApiOperation(value = "Get project instance data as CSV")
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Project instance found", response = String.class),
-			@ApiResponse(code = 404, message = "Project instance not found")
-	})
-	@GetMapping(value = "/projects/{projectid}", produces = "text/comma-separated-values")
-	public ResponseEntity<String> getProjectAsCsv(@PathVariable Long projectid, @RequestParam String format) {
-		ResponseEntity<String> response = null;
-		try {
-			Project project = projectService.findById(projectid);
-			String result = null;
-			if(format.equals("HomeAssistant")) {
-				List<Room> rooms = roomService.findByProjectId(projectid);
-				List<Device> devices = new ArrayList<>();
-				for(Room room : rooms) {
-					devices.addAll(deviceService.findByRoomId(room.getRoomid()));
-				}
-				List<GroupAddress> groupAddresses = new ArrayList<>();
-				for(Device device : devices) {
-					groupAddresses.addAll(groupAddressService.findByDeviceId(device.getDeviceid()));
-				}
-				result = HomeAssistantCsvGenerator.generateCsv(project, rooms, devices, groupAddresses);
-			} else {
-				result = String.format("Unsupported format [%s]", format);
+	private String generateCsv(Project project, String format) throws IOException {
+		String result = null;
+		if(format.equals("HomeAssistant")) {
+			List<Room> rooms = roomService.findByProjectId(project.getProjectid());
+			List<Device> devices = new ArrayList<>();
+			for(Room room : rooms) {
+				devices.addAll(deviceService.findByRoomId(room.getRoomid()));
 			}
-			response = new ResponseEntity<String>(result, HttpStatus.OK);
-		} catch (IOException e) {
-			LOGGER.error("CSV rendering failed: " + e.getMessage());
-			response = new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-		} catch(EntityNotFoundException e) {
-			LOGGER.error(e.getMessage());
-			response = new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+			List<GroupAddress> groupAddresses = new ArrayList<>();
+			for(Device device : devices) {
+				groupAddresses.addAll(groupAddressService.findByDeviceId(device.getDeviceid()));
+			}
+			result = HomeAssistantCsvGenerator.generateCsv(project, rooms, devices, groupAddresses);
+		} else {
+			result = String.format("Unsupported format [%s]", format);
 		}
-		return response;
+		return result;
 	}
 	
 	@ApiOperation(value = "Get project list. A single project can be retrieve by name overa query parameter")

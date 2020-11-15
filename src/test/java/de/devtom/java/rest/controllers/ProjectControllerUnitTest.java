@@ -89,6 +89,7 @@ public class ProjectControllerUnitTest extends AbstractControllerUnitTest {
 			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(URI + "/" + projectid)).andReturn();
 			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
 			
+			assertEquals(MediaType.APPLICATION_JSON_VALUE, mvcResult.getResponse().getContentType());
 			validateHttpStatus(HttpStatus.OK, mvcResult);
 			String content = mvcResult.getResponse().getContentAsString();
 			String outputJson = mapToJson(project);
@@ -171,12 +172,13 @@ public class ProjectControllerUnitTest extends AbstractControllerUnitTest {
 			Mockito.when(roomService.findByProjectId(Mockito.anyLong())).thenReturn(rooms);
 			Mockito.when(deviceService.findByRoomId(Mockito.anyLong())).thenReturn(devices);
 			Mockito.when(groupAddressService.findByDeviceId(Mockito.anyLong())).thenReturn(groupAddresses);
-			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(URI + "/1?format=HomeAssistant").accept("text/comma-separated-values")).andReturn();
+			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(URI + "/1?format=HomeAssistant").accept("text/csv")).andReturn();
 			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
 			Mockito.verify(roomService, Mockito.times(1)).findByProjectId(Mockito.anyLong());
 			Mockito.verify(deviceService, Mockito.times(1)).findByRoomId(Mockito.anyLong());
 			Mockito.verify(groupAddressService, Mockito.times(2)).findByDeviceId(Mockito.anyLong());
 			
+			assertEquals(ProjectController.MEDIA_TYPE_CSV_STRING, mvcResult.getResponse().getContentType());
 			validateHttpStatus(HttpStatus.OK, mvcResult);
 		} catch (Exception e) {
 			fail(e.getMessage());

@@ -21,5 +21,5 @@ sqlite> .read src/test/resources/data-sqlite.sql
 
 ## Get devices of a project as CSV file
 ```
-curl -v -H "Accept: text/comma-separated-values" "http://localhost:8080/knx-db/projects/1?format=HomeAssistant"
+curl -v -H "Accept: text/csv" "http://localhost:8080/knx-db/projects/1?format=HomeAssistant"
 ```

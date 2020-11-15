@@ -4,6 +4,9 @@ import static de.devtom.java.config.KnxDbApplicationConfiguration.BASE_PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.EntityNotFoundException;
 
 import org.junit.jupiter.api.Test;
@@ -213,6 +216,42 @@ public class DeviceControllerUnitTest extends AbstractControllerUnitTest {
 			validateHttpStatus(HttpStatus.OK, mvcResult);
 			String content = mvcResult.getResponse().getContentAsString();
 			String outputJson = mapToJson(device);
+			assertEquals(outputJson, content);
+		} catch (JsonProcessingException e) {
+			fail(e.getMessage());
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testGetDeviceList() {
+		Project project = new Project(PROJECT_NAME);
+		project.setProjectid(PROJECT_ID);
+		Room room = new Room(ROOM_NAME, ROOM_LABEL);
+		room.setRoomid(ROOM_ID);
+		room.setProject(project);
+		List<Device> deviceList = new ArrayList<>();
+		Device device1 = new Device(DEVICE_LABEL, DEVICE_TYPE);
+		device1.setDeviceid(DEVICE_ID);
+		device1.setRoom(room);
+		deviceList.add(device1);
+		Device device2 = new Device("label2", "type2");
+		device2.setDeviceid(2l);
+		device2.setRoom(room);
+		deviceList.add(device2);
+		try {
+			Mockito.when(projectService.findById(Mockito.anyLong())).thenReturn(project);
+			Mockito.when(roomService.findById(Mockito.anyLong())).thenReturn(room);
+			Mockito.when(deviceService.findByRoomId(Mockito.anyLong())).thenReturn(deviceList);
+			MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(URI)).andReturn();
+			Mockito.verify(projectService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(roomService, Mockito.times(1)).findById(Mockito.anyLong());
+			Mockito.verify(deviceService, Mockito.times(1)).findByRoomId(Mockito.anyLong());
+			
+			validateHttpStatus(HttpStatus.OK, mvcResult);
+			String content = mvcResult.getResponse().getContentAsString();
+			String outputJson = mapToJson(deviceList);
 			assertEquals(outputJson, content);
 		} catch (JsonProcessingException e) {
 			fail(e.getMessage());
