@@ -13,7 +13,6 @@
 	<properties>
 		<springfox-boot-starter.version>3.0.0</springfox-boot-starter.version>
 		<springfox-swagger-ui.version>3.0.0</springfox-swagger-ui.version>
-		<dockerfile-maven-plugin.version>1.4.13</dockerfile-maven-plugin.version>
 		<docker.repository>tosate/knxdb</docker.repository>
 		<commons-csv.version>1.8</commons-csv.version>
 	</properties>
@@ -79,46 +78,6 @@
 						<goals>
 							<goal>repackage</goal>
 						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
-				<version>${dockerfile-maven-plugin.version}</version>
-				<executions>
-					<execution>
-						<id>build-image</id>
-						<goals>
-							<goal>build</goal>
-						</goals>
-						<phase>package</phase>
-						<configuration>
-							<repository>${docker.repository}</repository>
-							<buildArgs>
-								<JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
-							</buildArgs>
-						</configuration>
-					</execution>
-					<execution>
-						<id>tag-image-latest</id>
-						<goals>
-							<goal>tag</goal>
-						</goals>
-						<configuration>
-							<repository>${docker.repository}</repository>
-							<tag>latest</tag>
-						</configuration>
-					</execution>
-					<execution>
-						<id>tag-image-version</id>
-						<goals>
-							<goal>tag</goal>
-						</goals>
-						<configuration>
-							<repository>${docker.repository}</repository>
-							<tag>${project.version}</tag>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
