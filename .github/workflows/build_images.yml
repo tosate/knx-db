@@ -43,6 +43,9 @@ jobs:
           name: knx-db-service
           path: ./knx-db-service.zip
 
+      - name: Display structure of downloaded files
+        run: ls -R
+
       - name: Unzip artifact
         run: unzip ./knx-db-service.zip
 
