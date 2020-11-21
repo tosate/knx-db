@@ -44,7 +44,7 @@ jobs:
           path: ./knx-db-service.zip
 
       - name: Unzip artifact
-        run unzip ./knx-db-service.zip
+        run: unzip ./knx-db-service.zip
 
       - name: Prepare
         id: prep
