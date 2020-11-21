@@ -41,13 +41,6 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: knx-db-service
-          path: ./knx-db-service.zip
-
-      - name: Display structure of downloaded files
-        run: ls -R
-
-      - name: Unzip artifact
-        run: unzip ./knx-db-service.zip
 
       - name: Prepare
         id: prep
@@ -99,4 +92,4 @@ jobs:
           push: true
           tags: ${{ steps.prep.outputs.tags}}
           build-args:
-            JAR_FILE=./knx-db-service.jar
+            JAR_FILE=./knx-db-service/knx-db-service.jar
