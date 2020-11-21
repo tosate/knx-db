@@ -27,12 +27,18 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: knx-db-service
+          name: knx-db-service.jar
           path: ./target/knx-db-service.jar
 
   docker:
     runs-on: ubuntu-latest
     steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: knx-db-service.jar
+          path: ./knx-db-service.jar
+
       - name: Prepare
         id: prep
         run: |
@@ -82,3 +88,5 @@ jobs:
           platforms: linux/amd64,linux/arm/v7
           push: true
           tags: ${{ steps.prep.outputs.tags}}
+          build-args:
+            JAR_FILE=./knx-db-service.jar
