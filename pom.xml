@@ -15,6 +15,7 @@
 		<springfox-swagger-ui.version>3.0.0</springfox-swagger-ui.version>
 		<docker.repository>tosate/knxdb</docker.repository>
 		<commons-csv.version>1.8</commons-csv.version>
+		<finalName>${project.artifactId}</finalName>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -51,7 +52,7 @@
 		    <artifactId>commons-csv</artifactId>
 		    <version>${commons-csv.version}</version>
 		</dependency>
-				
+
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -66,6 +67,7 @@
 		</dependency>
 	</dependencies>
 	<build>
+		<finalName>${finalName}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

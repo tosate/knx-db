@@ -8,7 +8,7 @@ on:
       - master
 
 jobs:
-  docker:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -24,6 +24,14 @@ jobs:
       - name: Maven Package
         run: mvn clean package
 
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+          name: knx-db-service
+          path: ./target/knx-db-service.jar
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
       - name: Prepare
         id: prep
         run: |
@@ -73,5 +81,3 @@ jobs:
           platforms: linux/amd64,linux/arm/v7
           push: true
           tags: ${{ steps.prep.outputs.tags}}
-          build-args: |
-            JAR_FILE=./target/knx-db-service-0.0.1-SNAPSHOT.jar
