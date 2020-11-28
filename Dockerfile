@@ -1,5 +1,5 @@
 # https://stackoverflow.com/questions/46057625/externalising-spring-boot-properties-when-deploying-to-docker
-FROM adoptopenjdk/openjdk11:jre-11.0.9_11-debianslim
+FROM adoptopenjdk/openjdk11:jdk11u-debian-nightly-slim
 COPY qemu-arm-static /usr/bin/qemu-arm-static
 MAINTAINER knx-db@devtom.de
 VOLUME /tmp
