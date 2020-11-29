@@ -30,12 +30,15 @@ import de.devtom.java.entities.Device;
 import de.devtom.java.entities.GroupAddress;
 import de.devtom.java.entities.Project;
 import de.devtom.java.entities.Room;
+import de.devtom.java.output.csv.AbstractCsvGenerator;
 import de.devtom.java.output.csv.HomeAssistantCsvGenerator;
+import de.devtom.java.output.csv.HomebridgeCsvGenerator;
 import de.devtom.java.services.DeviceService;
 import de.devtom.java.services.GroupAddressService;
 import de.devtom.java.services.ProjectService;
 import de.devtom.java.services.RoomService;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
@@ -79,7 +82,13 @@ public class ProjectController {
 			@ApiResponse(code = 404, message = "Project instance no found")
 	})
 	@GetMapping(value = "/projects/{projectid}", produces = {MediaType.APPLICATION_JSON_VALUE,MEDIA_TYPE_CSV_STRING})
-	public ResponseEntity<?> getProject(@PathVariable Long projectid, @RequestParam(required = false) String format) {
+	public ResponseEntity<?> getProject(
+			@ApiParam(value = "Project ID")
+			@PathVariable(name = "projectid", required = true)
+			Long projectid,
+			@ApiParam(value = "Optional parameter to define CSV output format")
+			@RequestParam(name = "format", required = false)
+			String format) {
 		ResponseEntity<?> response = null;
 		try {
 			Project project = projectService.findById(projectid);
@@ -105,7 +114,7 @@ public class ProjectController {
 	
 	private String generateCsv(Project project, String format) throws IOException {
 		String result = null;
-		if(format.equals("HomeAssistant")) {
+		if(!StringUtils.isEmpty(format)) {
 			List<Room> rooms = roomService.findByProjectId(project.getProjectid());
 			List<Device> devices = new ArrayList<>();
 			for(Room room : rooms) {
@@ -115,17 +124,32 @@ public class ProjectController {
 			for(Device device : devices) {
 				groupAddresses.addAll(groupAddressService.findByDeviceId(device.getDeviceid()));
 			}
-			result = HomeAssistantCsvGenerator.generateCsv(project, rooms, devices, groupAddresses);
-		} else {
-			result = String.format("Unsupported format [%s]", format);
+			
+			AbstractCsvGenerator generator = null;
+			switch(format) {
+			case "HomeAssistant":
+				generator = new HomeAssistantCsvGenerator();
+				result = generator.generateCsv(project, rooms, devices, groupAddresses);
+				break;
+			case "Homebridge":
+				generator = new HomebridgeCsvGenerator();
+				result = generator.generateCsv(project, rooms, devices, groupAddresses);
+				break;
+			default:
+				result = String.format("Unsupported format [%s]", format);
+			}
 		}
+		
 		return result;
 	}
 	
 	@ApiOperation(value = "Get project list. A single project can be retrieve by name overa query parameter")
 	@ApiResponse(code = 200, message = "List of projects", response = List.class)
 	@GetMapping(value = "/projects", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<Project>> getProjectList(@RequestParam(required = false) String name) {
+	public ResponseEntity<List<Project>> getProjectList(
+			@ApiParam(value = "Optional name filter value")
+			@RequestParam(required = false)
+			String name) {
 		ResponseEntity<List<Project>> response = null;
 		if(StringUtils.isEmpty(name)) {
 			response = new ResponseEntity<>(projectService.list(), HttpStatus.OK);
@@ -149,7 +173,12 @@ public class ProjectController {
 		@ApiResponse(code = 404, message = "Project instance to replace not found")
 	})
 	@PutMapping(value = "/projects/{projectid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> replaceExistingProject(@PathVariable Long projectid, @RequestBody Project project) {
+	public ResponseEntity<?> replaceExistingProject(
+			@ApiParam(value = "Project ID")
+			@PathVariable(name = "projectid", required = true)
+			Long projectid,
+			@RequestBody
+			Project project) {
 		ResponseEntity<?> response = null;
 		try {
 			validateProjectName(project);
@@ -172,7 +201,10 @@ public class ProjectController {
 			@ApiResponse(code = 404, message = "Project to delete not found")
 	})
 	@DeleteMapping(value = "/projects/{projectid}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> deleteProject(@PathVariable Long projectid) {
+	public ResponseEntity<?> deleteProject(
+			@ApiParam(value = "Project ID")
+			@PathVariable(name = "projectid", required = true)
+			Long projectid) {
 		ResponseEntity<?> response = null;
 		try {
 			Project existingProject = projectService.findById(projectid);

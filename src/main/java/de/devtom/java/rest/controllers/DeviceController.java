@@ -28,6 +28,7 @@ import de.devtom.java.services.DeviceService;
 import de.devtom.java.services.ProjectService;
 import de.devtom.java.services.RoomService;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
@@ -50,7 +51,15 @@ public class DeviceController {
 			@ApiResponse(code = 404, message = "Entity not found")
 	})
 	@PostMapping(value = "/projects/{projectid}/rooms/{roomid}/devices", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> createDevice(@PathVariable Long projectid, @PathVariable Long roomid, @RequestBody Device device) {
+	public ResponseEntity<?> createDevice(
+			@ApiParam(value = "Project ID")
+			@PathVariable(name = "projectid", required = true)
+			Long projectid,
+			@ApiParam(value = "Room ID")
+			@PathVariable(name = "roomid", required = true)
+			Long roomid,
+			@RequestBody
+			Device device) {
 		ResponseEntity<?> response = null;
 		try {
 			validateDeviceFields(device);
@@ -76,7 +85,16 @@ public class DeviceController {
 			@ApiResponse(code = 404, message = "Device instance not found")
 	})
 	@GetMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getDevice(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid) {
+	public ResponseEntity<?> getDevice(
+			@ApiParam(value = "Project ID")
+			@PathVariable(name = "projectid", required = true)
+			Long projectid,
+			@ApiParam(value = "Room ID")
+			@PathVariable(name = "roomid", required = true)
+			Long roomid,
+			@ApiParam("Device ID")
+			@PathVariable(name = "deviceid", required = true)
+			Long deviceid) {
 		ResponseEntity<?> response = null;
 		try {
 			projectService.findById(projectid);
@@ -99,7 +117,13 @@ public class DeviceController {
 			@ApiResponse(code = 404, message = "Entity not found")
 	})
 	@GetMapping(value = "/projects/{projectid}/rooms/{roomid}/devices", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getDeviceList(@PathVariable Long projectid, @PathVariable Long roomid) {
+	public ResponseEntity<?> getDeviceList(
+			@ApiParam(value = "Project ID")
+			@PathVariable(name = "projectid", required = true)
+			Long projectid,
+			@ApiParam(value = "Room ID")
+			@PathVariable(name = "roomid", required = true)
+			Long roomid) {
 		ResponseEntity<?> response = null;
 		try {
 			projectService.findById(projectid);
@@ -120,7 +144,17 @@ public class DeviceController {
 			@ApiResponse(code = 404, message = "Device instance to replace not found") 
 	})
 	@PutMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> replaceExistingDevice(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid, @RequestBody Device device) {
+	public ResponseEntity<?> replaceExistingDevice(
+			@ApiParam(value = "Project ID")
+			@PathVariable(name = "projectid", required = true)
+			Long projectid,
+			@ApiParam(value = "Room ID")
+			@PathVariable(name = "roomid", required = true)
+			Long roomid,
+			@ApiParam(value = "Device ID")
+			@PathVariable(name = "deviceid", required = true)
+			Long deviceid,
+			@RequestBody Device device) {
 		ResponseEntity<?> response = null;
 		try {
 			validateDeviceFields(device);
@@ -146,7 +180,16 @@ public class DeviceController {
 			@ApiResponse(code = 404, message = "Device to delete not found")
 	})
 	@DeleteMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> deleteDevice(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid) {
+	public ResponseEntity<?> deleteDevice(
+			@ApiParam(value = "Project ID")
+			@PathVariable(name = "projectid", required = true)
+			Long projectid,
+			@ApiParam(value = "Room ID")
+			@PathVariable(name = "roomid", required = true)
+			Long roomid,
+			@ApiParam(value = "Device ID")
+			@PathVariable(name = "deviceid", required = true)
+			Long deviceid) {
 		ResponseEntity<?> response = null;
 		try {
 			projectService.findById(projectid);

@@ -27,6 +27,7 @@ import de.devtom.java.entities.Room;
 import de.devtom.java.services.ProjectService;
 import de.devtom.java.services.RoomService;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
@@ -47,7 +48,12 @@ public class RoomController {
 			@ApiResponse(code = 404, message = "Entity not found")
 	})
 	@PostMapping(value = "/projects/{projectid}/rooms", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> createRoom(@PathVariable Long projectid, @RequestBody Room room) {
+	public ResponseEntity<?> createRoom(
+			@ApiParam(value = "Project ID")
+			@PathVariable(name = "projectid", required = true)
+			Long projectid,
+			@RequestBody
+			Room room) {
 		ResponseEntity<?> response = null;
 		try {
 			validateRoomFields(room);
@@ -72,7 +78,13 @@ public class RoomController {
 			@ApiResponse(code = 404, message = "Room instance not found")
 	})
 	@GetMapping(value = "/projects/{projectid}/rooms/{roomid}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getRoom(@PathVariable Long projectid, @PathVariable Long roomid) {
+	public ResponseEntity<?> getRoom(
+			@ApiParam(value = "Project ID")
+			@PathVariable(name = "projectid", required = true)
+			Long projectid,
+			@ApiParam(value = "Room ID")
+			@PathVariable(name = "roomid", required = true)
+			Long roomid) {
 		ResponseEntity<?> response = null;
 		try {
 			projectService.findById(projectid);
@@ -94,7 +106,10 @@ public class RoomController {
 			@ApiResponse(code = 404, message = "Project not found")
 	})
 	@GetMapping(value = "/projects/{projectid}/rooms", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getRoomList(@PathVariable Long projectid) {
+	public ResponseEntity<?> getRoomList(
+			@ApiParam(value = "Project ID")
+			@PathVariable(name = "projectid", required = true)
+			Long projectid) {
 		ResponseEntity<?> response = null;
 		try {
 			projectService.findById(projectid);
@@ -114,7 +129,14 @@ public class RoomController {
 			@ApiResponse(code = 404, message = "Room instance to replace not found")
 	})
 	@PutMapping(value = "/projects/{projectid}/rooms/{roomid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> replaceExistingRoom(@PathVariable Long projectid, @PathVariable Long roomid, @RequestBody Room room) {
+	public ResponseEntity<?> replaceExistingRoom(
+			@ApiParam(value = "Project ID")
+			@PathVariable(name = "projectid", required = true)
+			Long projectid,
+			@ApiParam(value = "Room ID")
+			@PathVariable(name = "roomid", required = true)
+			Long roomid,
+			@RequestBody Room room) {
 		ResponseEntity<?> response = null;
 		try {
 			validateRoomFields(room);
@@ -139,7 +161,13 @@ public class RoomController {
 			@ApiResponse(code = 404, message = "Room to delete not found")
 	})
 	@DeleteMapping(value = "/projects/{projectid}/rooms/{roomid}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> deleteRoom(@PathVariable Long projectid, @PathVariable Long roomid) {
+	public ResponseEntity<?> deleteRoom(
+			@ApiParam(value = "Project ID")
+			@PathVariable(name = "projectid", required = true)
+			Long projectid,
+			@ApiParam(value = "Room ID")
+			@PathVariable(name = "roomid", required = true)
+			Long roomid) {
 		ResponseEntity<?> response = null;
 		try {
 			projectService.findById(projectid);

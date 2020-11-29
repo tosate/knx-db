@@ -1,45 +1,21 @@
 package de.devtom.java.output.csv;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import de.devtom.java.entities.Device;
 import de.devtom.java.entities.GroupAddress;
-import de.devtom.java.entities.Project;
 import de.devtom.java.entities.Room;
 
-public class HomeAssistantCsvGenerator {
+public class HomeAssistantCsvGenerator extends AbstractCsvGenerator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(HomeAssistantCsvGenerator.class);
 	
-	public static String generateCsv(Project project, List<Room> rooms, List<Device> devices, List<GroupAddress> groupAddresses) throws IOException {
-		StringWriter out = new StringWriter();
-		try (CSVPrinter printer = new CSVPrinter(out, CSVFormat.DEFAULT.withHeader(getHeaders()))) {
-			for(Room room : rooms) {
-				for(Device device : devices) {
-					if(device.getRoom().getRoomid().equals(room.getRoomid())) {
-						List<GroupAddress> deviceGroupAddresses = new ArrayList<>();
-						for(GroupAddress g : groupAddresses) {
-							if(g.getDevice().getDeviceid().equals(device.getDeviceid())) {
-								deviceGroupAddresses.add(g);
-							}
-						}
-						printer.printRecord(deviceToValue(room, device, deviceGroupAddresses));
-					}
-				}
-			}
-		}
-		return out.toString();
-	}
-	
-	private static List<String> deviceToValue(Room room, Device device, List<GroupAddress> deviceGroupAddresses) {
+	@Override
+	protected List<String> deviceToValue(Room room, Device device, List<GroupAddress> deviceGroupAddresses) {
 		List<String> row = new ArrayList<>();
 		row.add(getDeviceName(room, device));
 		row.add(device.getLabel());
@@ -52,7 +28,7 @@ public class HomeAssistantCsvGenerator {
 		return row;
 	}
 	
-	private static void addGroupAddresses(List<String> row, Device device, List<GroupAddress> deviceGroupAddresses) {
+	private void addGroupAddresses(List<String> row, Device device, List<GroupAddress> deviceGroupAddresses) {
 		switch(device.getDeviceType()) {
 		case Device.TYPE_LIGHTBULB:
 			generateGroupAddressColumns(row, deviceGroupAddresses, 1, 4, null, null, null, null);
@@ -87,7 +63,7 @@ public class HomeAssistantCsvGenerator {
 		}
 	}
 	
-	private static void generateGroupAddressColumns(List<String> row, List<GroupAddress> groupAddresses, Integer middleGroup1, Integer middleGroup2, Integer middleGroup3, Integer middleGroup4, Integer middleGroup5, Integer middleGroup6) {
+	private void generateGroupAddressColumns(List<String> row, List<GroupAddress> groupAddresses, Integer middleGroup1, Integer middleGroup2, Integer middleGroup3, Integer middleGroup4, Integer middleGroup5, Integer middleGroup6) {
 		if(middleGroup1 != null) {
 			row.add(getGroupAddressByMiddleGroup(groupAddresses, middleGroup1));
 		} else {
@@ -120,16 +96,6 @@ public class HomeAssistantCsvGenerator {
 		}
 	}
 
-	private static String getGroupAddressByMiddleGroup(List<GroupAddress> groupAddresses, int middleGroup) {
-		for(GroupAddress address : groupAddresses) {
-			if(address.getMiddleGroup() == middleGroup) {
-				return address.toString();
-			}
-		}
-		LOGGER.warn("Group address list does not include address with middle group [{}].", middleGroup);
-		return "";
-	}
-
 	private static String getRoomName(Room room) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(room.getFloor());
@@ -139,7 +105,7 @@ public class HomeAssistantCsvGenerator {
 		return sb.toString();
 	}
 
-	private static String getDeviceName(Room room, Device device) {
+	private String getDeviceName(Room room, Device device) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(room.getFloor());
 		sb.append('-');
@@ -154,7 +120,8 @@ public class HomeAssistantCsvGenerator {
 		return sb.toString();
 	}
 
-	private static String[] getHeaders() {
+	@Override
+	protected String[] getHeaders() {
 		return new String[] {"NAME","LABEL","FLOOR","ROOM_NAME","ROOM_LABEL","TYPE","GA1","GA2","GA3","GA4","GA5","GA6"};
 	}
 }

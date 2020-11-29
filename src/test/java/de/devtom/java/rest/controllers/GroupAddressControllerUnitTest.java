@@ -42,7 +42,7 @@ public class GroupAddressControllerUnitTest extends AbstractControllerUnitTest {
 	private static final Long GROUP_ADDRESS_ID = 1l;
 	private static final String URI = BASE_PATH + "/projects/" + PROJECT_ID + "/rooms/" + ROOM_ID + "/devices/" + DEVICE_ID + "/group-addresses";
 	private static final int ADDR_MAIN_GROUP = 1;
-	private static final int ADDR_MIDDLE_GROUP = 1;
+	private static final int ADDR_MIDDLE_GROUP = 2;
 	private static final int ADDR_SUB_GROUP = 1;
 	@MockBean
 	private ProjectService projectService;

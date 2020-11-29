@@ -28,6 +28,7 @@ import de.devtom.java.services.GroupAddressService;
 import de.devtom.java.services.ProjectService;
 import de.devtom.java.services.RoomService;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
@@ -51,7 +52,18 @@ public class GroupAddressController {
 			@ApiResponse(code = 404, message = "Entity not found")
 	})
 	@PostMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}/group-addresses", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> createGroupAddress(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid, @RequestBody GroupAddress groupAddress) {
+	public ResponseEntity<?> createGroupAddress(
+			@ApiParam(value = "Project ID")
+			@PathVariable(name = "projectid", required = true)
+			Long projectid,
+			@ApiParam(value = "Room ID")
+			@PathVariable(name = "roomid", required = true)
+			Long roomid,
+			@ApiParam(value = "Device ID")
+			@PathVariable(name = "deviceid", required = true)
+			Long deviceid,
+			@RequestBody
+			GroupAddress groupAddress) {
 		ResponseEntity<?> response = null;
 		try {
 			projectService.findById(projectid);
@@ -77,7 +89,19 @@ public class GroupAddressController {
 			@ApiResponse(code = 404, message = "Group address not found")
 	})
 	@GetMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}/group-addresses/{groupaddressid}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getGroupAddress(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid, @PathVariable Long groupaddressid) {
+	public ResponseEntity<?> getGroupAddress(
+			@ApiParam(value = "Project ID")
+			@PathVariable(name = "projectid", required = true)
+			Long projectid,
+			@ApiParam(value = "Room ID")
+			@PathVariable(name = "roomid", required = true)
+			Long roomid,
+			@ApiParam(value = "Device ID")
+			@PathVariable(name = "deviceid", required = true)
+			Long deviceid,
+			@ApiParam(value = "Group address ID")
+			@PathVariable(name = "groupaddressid", required = true)
+			Long groupaddressid) {
 		ResponseEntity<?> response = null;
 		try {
 			projectService.findById(projectid);
@@ -101,7 +125,16 @@ public class GroupAddressController {
 			@ApiResponse(code = 404, message = "Entity not fould")
 	})
 	@GetMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}/group-addresses", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getGroupAddressList(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid) {
+	public ResponseEntity<?> getGroupAddressList(
+			@ApiParam(value = "Project ID")
+			@PathVariable(name = "projectid", required = true)
+			Long projectid,
+			@ApiParam(value = "Room ID")
+			@PathVariable(name = "roomid", required = true)
+			Long roomid,
+			@ApiParam(value = "Device ID")
+			@PathVariable(name = "deviceid", required = true)
+			Long deviceid) {
 		ResponseEntity<?> response = null;
 		try {
 			projectService.findById(projectid);
@@ -123,7 +156,21 @@ public class GroupAddressController {
 			@ApiResponse(code = 404, message = "Group address instance to replace not found")
 	})
 	@PutMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}/group-addresses/{groupaddressid}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> replaceExistingGroupAddress(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid, @PathVariable Long groupaddressid, @RequestBody GroupAddress groupAddress) {
+	public ResponseEntity<?> replaceExistingGroupAddress(
+			@ApiParam(value = "Project ID")
+			@PathVariable(name = "projectid", required = true)
+			Long projectid,
+			@ApiParam(value = "Room ID")
+			@PathVariable(name = "roomid", required = true)
+			Long roomid,
+			@ApiParam(value = "Device ID")
+			@PathVariable(name = "deviceid", required = true)
+			Long deviceid,
+			@ApiParam(value = "Group address ID")
+			@PathVariable(name = "groupaddressid", required = true)
+			Long groupaddressid,
+			@RequestBody
+			GroupAddress groupAddress) {
 		ResponseEntity<?> response = null;
 		
 		try {
@@ -150,7 +197,19 @@ public class GroupAddressController {
 			@ApiResponse(code = 404, message = "Group address to delete not found")
 	})
 	@DeleteMapping(value = "/projects/{projectid}/rooms/{roomid}/devices/{deviceid}/group-addresses/{groupaddressid}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> deleteGroupAddress(@PathVariable Long projectid, @PathVariable Long roomid, @PathVariable Long deviceid, @PathVariable Long groupaddressid) {
+	public ResponseEntity<?> deleteGroupAddress(
+			@ApiParam(value = "Project ID")
+			@PathVariable(name = "projectid", required = true)
+			Long projectid,
+			@ApiParam(value = "Room ID")
+			@PathVariable(name = "roomid", required = true)
+			Long roomid,
+			@ApiParam(value = "Device ID")
+			@PathVariable(name = "deviceid", required = true)
+			Long deviceid,
+			@ApiParam(value = "Group address ID")
+			@PathVariable(name = "groupaddressid", required = true)
+			Long groupaddressid) {
 		ResponseEntity<?> response = null;
 		try {
 			projectService.findById(projectid);
